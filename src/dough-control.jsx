@@ -208,6 +208,110 @@ const TROUBLE_CATS = [
   { id: "bake", name: "Cuisson" },
 ];
 
+/* ───────────────────── R8 : VISUELS DE TECHNIQUE ──────────────────
+   Registre autonome (pas de réseau). Chaque entrée fournit une
+   animation SVG/CSS qui est TOUJOURS le fallback rendu — donc valable
+   à l'identique dans l'artifact et en prod. `media` est un slot
+   optionnel : si une URL est fournie (jamais en artifact), la prod
+   rend une <video> par-dessus le SVG. Zéro diff de logique.            */
+const SVG = { width: 132, height: 112, viewBox: "0 0 132 112" };
+const TECHNIQUES = [
+  {
+    id: "autolyse",
+    name: "Autolyse + pétrissage",
+    blurb: "Farine + eau seules, 20 min de repos avant le sel : le gluten se forme tout seul, le pétrissage final est plus court.",
+    Svg: () => (
+      <svg {...SVG} className="techsvg" role="img" aria-label="Autolyse">
+        <path d="M28 60 a38 24 0 0 0 76 0" fill="none" stroke="var(--line)" strokeWidth="4" strokeLinecap="round" />
+        <circle className="t-drop" cx="66" cy="26" r="6" fill="var(--gold)" />
+        <ellipse className="t-pulse" cx="66" cy="60" rx="30" ry="15" fill="var(--ember)" opacity="0.85" />
+        <line className="t-swirl" x1="66" y1="60" x2="66" y2="30" stroke="var(--flour)" strokeWidth="4" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    id: "coilfold",
+    name: "Coil fold (rabat)",
+    blurb: "Soulevez la pâte par le centre, laissez les bords s'enrouler dessous. 1–2 fois la première heure pour tendre le réseau, sans dégazer.",
+    Svg: () => (
+      <svg {...SVG} className="techsvg" role="img" aria-label="Coil fold">
+        <line x1="20" y1="84" x2="112" y2="84" stroke="var(--line)" strokeWidth="3" />
+        <g className="t-lift">
+          <path d="M40 80 q26 -34 52 0 q-26 14 -52 0 Z" fill="var(--ember)" opacity="0.9" />
+          <path d="M52 74 q14 -10 28 0" fill="none" stroke="var(--flour)" strokeWidth="3" strokeLinecap="round" />
+        </g>
+      </svg>
+    ),
+  },
+  {
+    id: "pirlatura",
+    name: "Staglio + pirlatura",
+    blurb: "Détaillez les pâtons, puis serrez chacun en boule par un mouvement circulaire sur le plan : surface tendue et lisse, soudure dessous.",
+    Svg: () => (
+      <svg {...SVG} className="techsvg" role="img" aria-label="Pirlatura">
+        <line x1="20" y1="86" x2="112" y2="86" stroke="var(--line)" strokeWidth="3" />
+        <g className="t-round">
+          <circle className="t-tighten" cx="66" cy="62" r="22" fill="var(--ember)" opacity="0.9" />
+          <path d="M48 62 a18 18 0 1 1 4 11" fill="none" stroke="var(--gold)" strokeWidth="3" strokeLinecap="round" />
+          <path d="M52 73 l-4 4 6 1" fill="none" stroke="var(--gold)" strokeWidth="3" strokeLinecap="round" />
+        </g>
+      </svg>
+    ),
+  },
+  {
+    id: "poke",
+    name: "Poke test (point de pousse)",
+    blurb: "Pressez doucement le pâton : l'empreinte revient lentement et à moitié ⇒ prêt. Trop vite ⇒ pas assez ; pas du tout ⇒ sur-fermenté.",
+    Svg: () => (
+      <svg {...SVG} className="techsvg" role="img" aria-label="Poke test">
+        <path d="M30 78 a36 30 0 0 1 72 0 Z" fill="var(--ember)" opacity="0.85" />
+        <circle className="t-poke" cx="66" cy="40" r="7" fill="var(--flour)" />
+      </svg>
+    ),
+  },
+  {
+    id: "stretch",
+    name: "Étalage",
+    blurb: "Du centre vers le bord, jamais la corniche. Repoussez le gaz vers le pourtour pour garder un cornicione gonflé. Rouleau interdit.",
+    Svg: () => (
+      <svg {...SVG} className="techsvg" role="img" aria-label="Étalage">
+        <circle className="t-grow" cx="66" cy="56" r="20" fill="none" stroke="var(--ember)" strokeWidth="6" />
+        <circle cx="66" cy="56" r="10" fill="var(--warn)" opacity="0.7" />
+      </svg>
+    ),
+  },
+  {
+    id: "launch",
+    name: "Enfournement & tour",
+    blurb: "Pelle farinée, geste sec pour lancer la pizza sur la sole. Puis quart de tour régulier dès que la corniche colore, pour un léopard homogène.",
+    Svg: () => (
+      <svg {...SVG} className="techsvg" role="img" aria-label="Enfournement">
+        <rect x="20" y="36" width="92" height="50" rx="6" fill="none" stroke="var(--line)" strokeWidth="4" />
+        <g className="t-launch">
+          <circle className="t-turn" cx="60" cy="64" r="14" fill="var(--ember)" opacity="0.9" />
+          <rect x="2" y="60" width="58" height="8" rx="4" fill="var(--gold)" />
+        </g>
+      </svg>
+    ),
+  },
+  {
+    id: "twostage",
+    name: "Cuisson maison en deux temps",
+    blurb: "Acier/pierre au max : base saucée sans fromage 4–5 min. Puis mozzarella + basilic et passage sous le grill à fond 2–3 min pour le léopard.",
+    Svg: () => (
+      <svg {...SVG} className="techsvg" role="img" aria-label="Cuisson deux temps">
+        <rect x="14" y="40" width="44" height="44" rx="6" fill="none" stroke="var(--line)" strokeWidth="3" />
+        <rect x="74" y="40" width="44" height="44" rx="6" fill="none" stroke="var(--line)" strokeWidth="3" />
+        <circle cx="36" cy="62" r="12" fill="var(--ember)" opacity="0.8" />
+        <circle cx="96" cy="62" r="12" fill="var(--gold)" opacity="0.9" />
+        <path className="t-heat" d="M90 50 h12 M90 74 h12" stroke="var(--warn)" strokeWidth="3" strokeLinecap="round" />
+        <path d="M60 62 h12 m-5 -4 l5 4 -5 4" fill="none" stroke="var(--flour)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+];
+const TECH_BY_ID = Object.fromEntries(TECHNIQUES.map((t) => [t.id, t]));
+
 /* ───────────────────────── HELPERS ────────────────────────────── */
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTVWXYZ23456789";
 const makeCode = () =>
@@ -283,6 +387,9 @@ export default function DoughControl() {
 
   /* ── troubleshooter ── */
   const [troubleCat, setTroubleCat] = useState("all");
+
+  /* ── R8 : techniques dépliées (clé = index de l'étape) ── */
+  const [openTech, setOpenTech] = useState(null);
 
   const isExpert = tier === "expert";
   const isAmateur = tier === "amateur";
@@ -407,8 +514,8 @@ export default function DoughControl() {
 
     let lead = effRoom + effCold + bigaH;
     let t = new Date(bakeAt.getTime() - lead * Hms);
-    const push = (title, desc, durH) => {
-      steps.push({ time: new Date(t), title, desc, dur: durH ? fmtDur(durH) : null });
+    const push = (title, desc, durH, tech) => {
+      steps.push({ time: new Date(t), title, desc, dur: durH ? fmtDur(durH) : null, tech });
       if (durH) t = new Date(t.getTime() + durH * Hms);
     };
 
@@ -417,25 +524,25 @@ export default function DoughControl() {
       push("Biga — fermentation", `${fmtDur(bigaH)} à ${fmtTemp(effBigaTemp, region)}, couverte.`, bigaH);
       push("Pétrissage final", `Biga + ${Math.round(calc.biga.restFlour)} g farine + ${Math.round(calc.biga.restWater)} g eau à ${fmtTemp(Math.round(calc.waterTemp), region)} + sel.`, 0);
     } else {
-      push("Pétrissage", `Eau à ${fmtTemp(Math.round(calc.waterTemp), region)}. Autolyse 20 min possible avant le sel.`, 0);
+      push("Pétrissage", `Eau à ${fmtTemp(Math.round(calc.waterTemp), region)}. Autolyse 20 min possible avant le sel.`, 0, ["autolyse"]);
     }
 
     if (effStrategy === "ambient" || effCold === 0) {
       const bulk = (effRoom + effCold) * 0.55, proof = (effRoom + effCold) - bulk;
-      push("Pointage (bulk)", `${fmtDur(bulk)} à ${fmtTemp(effAmbient, region)}, couvert. 1–2 rabats la première heure.`, bulk);
-      push("Boulage (staglio)", `${pizzas} pâtons de ${calc.ball} g. Pirlatura serrée.`, 0);
-      push("Apprêt", `${fmtDur(proof)} à température ambiante, en bac fermé.`, proof);
+      push("Pointage (bulk)", `${fmtDur(bulk)} à ${fmtTemp(effAmbient, region)}, couvert. 1–2 rabats la première heure.`, bulk, ["coilfold"]);
+      push("Boulage (staglio)", `${pizzas} pâtons de ${calc.ball} g. Pirlatura serrée.`, 0, ["pirlatura"]);
+      push("Apprêt", `${fmtDur(proof)} à température ambiante, en bac fermé.`, proof, ["poke"]);
     } else if (effStrategy === "coldmat") {
       const bulk = effRoom - temper;
-      push("Pointage court", `${fmtDur(bulk)} à ${fmtTemp(effAmbient, region)}.`, bulk);
+      push("Pointage court", `${fmtDur(bulk)} à ${fmtTemp(effAmbient, region)}.`, bulk, ["coilfold"]);
       push("Maturation au froid", `${fmtDur(effCold)} au frigo à ${fmtTemp(effFridge, region)} — c'est lui qui travaille.`, effCold);
-      push("Boulage + détente", `${pizzas} pâtons de ${calc.ball} g, puis ${fmtDur(temper)} à température ambiante.`, temper);
+      push("Boulage + détente", `${pizzas} pâtons de ${calc.ball} g, puis ${fmtDur(temper)} à température ambiante.`, temper, ["pirlatura", "poke"]);
     } else {
       const bulk = effRoom - temper;
-      push("Pointage chaud (bulk)", `${fmtDur(bulk)} à ${fmtTemp(effAmbient, region)} jusqu'au double de volume.`, bulk);
-      push("Boulage (staglio)", `${pizzas} pâtons de ${calc.ball} g. Pirlatura serrée.`, 0);
+      push("Pointage chaud (bulk)", `${fmtDur(bulk)} à ${fmtTemp(effAmbient, region)} jusqu'au double de volume.`, bulk, ["coilfold"]);
+      push("Boulage (staglio)", `${pizzas} pâtons de ${calc.ball} g. Pirlatura serrée.`, 0, ["pirlatura"]);
       push("Frigo-frein", `${fmtDur(effCold)} à ${fmtTemp(effFridge, region)} : le froid freine, il ne fait que tenir.`, effCold);
-      push("Détente (temper)", `${fmtDur(temper)} à température ambiante avant d'étaler.`, temper);
+      push("Détente (temper)", `${fmtDur(temper)} à température ambiante avant d'étaler.`, temper, ["poke"]);
     }
 
     steps.push({
@@ -443,7 +550,13 @@ export default function DoughControl() {
       title: "Préchauffage du four",
       desc: `${O.name} : ${O.preheat} min. ${locTemps(O.tip, region)}`,
     });
-    steps.push({ time: new Date(bakeAt), title: "🔥 Cuisson", desc: `${O.bake} par pizza.`, bake: true });
+    steps.push({
+      time: new Date(bakeAt),
+      title: "🔥 Cuisson",
+      desc: `${O.bake} par pizza.`,
+      bake: true,
+      tech: O.hot ? ["stretch", "launch"] : ["stretch", "twostage"],
+    });
     return steps;
   }, [bakeAt, method, effRoom, effCold, effStrategy, effAmbient, effFridge, effBigaTemp, calc, pizzas, O, region, M.hours]);
 
@@ -559,7 +672,35 @@ export default function DoughControl() {
   .codebig{font-size:28px;letter-spacing:6px;color:var(--gold);font-weight:600}
   input.txt{background:var(--surface2);border:1px solid var(--line);border-radius:8px;color:var(--flour);padding:10px 12px;font-size:14px;font-family:'JetBrains Mono',monospace;width:100%}
   input.txt:focus{outline:none;border-color:var(--ember)}
-  @media(prefers-reduced-motion:reduce){.dc *{transition:none!important}}
+  .techbtn{background:none;border:none;color:var(--gold);font-family:'Albert Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;padding:2px 0}
+  .techbtn:hover{color:var(--ember)}
+  .techfig{display:flex;gap:12px;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
+  .techmedia{flex:0 0 auto;width:132px;height:112px;display:flex;align-items:center;justify-content:center}
+  .techvid{width:132px;height:112px;border-radius:8px;object-fit:cover}
+  @media(max-width:560px){.techfig{flex-direction:column;align-items:flex-start}}
+  .t-pulse{transform-box:fill-box;transform-origin:center;animation:t-pulse 2.4s ease-in-out infinite}
+  @keyframes t-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+  .t-drop{animation:t-drop 2.4s ease-in infinite}
+  @keyframes t-drop{0%{transform:translateY(0);opacity:0}25%{opacity:1}55%,100%{transform:translateY(30px);opacity:0}}
+  .t-swirl{transform-box:fill-box;transform-origin:bottom;animation:t-swirl 2.4s ease-in-out infinite}
+  @keyframes t-swirl{0%,100%{transform:rotate(-22deg)}50%{transform:rotate(22deg)}}
+  .t-lift{transform-box:fill-box;transform-origin:bottom;animation:t-lift 2.6s ease-in-out infinite}
+  @keyframes t-lift{0%,100%{transform:translateY(0) scaleY(1)}45%{transform:translateY(-18px) scaleY(1.15)}}
+  .t-round{transform-box:fill-box;transform-origin:66px 62px;animation:t-round 3s linear infinite}
+  @keyframes t-round{to{transform:rotate(360deg)}}
+  .t-tighten{transform-box:fill-box;transform-origin:center;animation:t-tighten 3s ease-in-out infinite}
+  @keyframes t-tighten{0%{transform:scale(1.12)}100%{transform:scale(.92)}}
+  .t-poke{animation:t-poke 2.8s ease-in-out infinite}
+  @keyframes t-poke{0%,100%{transform:translateY(0)}30%{transform:translateY(26px)}45%{transform:translateY(26px)}80%{transform:translateY(4px)}}
+  .t-grow{transform-box:fill-box;transform-origin:center;animation:t-grow 2.6s ease-out infinite}
+  @keyframes t-grow{0%{transform:scale(.45)}70%,100%{transform:scale(1)}}
+  .t-launch{animation:t-launch 2.8s ease-in-out infinite}
+  @keyframes t-launch{0%{transform:translateX(38px)}40%,100%{transform:translateX(0)}}
+  .t-turn{transform-box:fill-box;transform-origin:center;animation:t-turn 2.8s steps(4) infinite}
+  @keyframes t-turn{to{transform:rotate(360deg)}}
+  .t-heat{animation:t-heat 1.6s ease-in-out infinite}
+  @keyframes t-heat{0%,100%{opacity:.25}50%{opacity:1}}
+  @media(prefers-reduced-motion:reduce){.dc *{transition:none!important}.techsvg *{animation:none!important}}
   @media print{
     body{background:#fff!important}
     .no-print{display:none!important}
@@ -1031,6 +1172,31 @@ export default function DoughControl() {
                     </div>
                     <div style={{ fontWeight: 700, fontSize: 14, margin: "2px 0" }}>{s.title}</div>
                     <div className="tip" style={{ marginTop: 0 }}>{s.desc}</div>
+                    {s.tech && s.tech.length > 0 && (
+                      <div className="no-print" style={{ marginTop: 6 }}>
+                        <button className="techbtn" onClick={() => setOpenTech(openTech === i ? null : i)}
+                          aria-expanded={openTech === i}>
+                          {openTech === i ? "▾" : "▸"} {openTech === i ? "Masquer la technique" : "Voir la technique"}
+                        </button>
+                        {openTech === i && s.tech.map((tid) => {
+                          const T = TECH_BY_ID[tid];
+                          if (!T) return null;
+                          return (
+                            <div key={tid} className="techfig">
+                              <div className="techmedia">
+                                {T.media
+                                  ? <video className="techvid" src={T.media} autoPlay loop muted playsInline />
+                                  : <T.Svg />}
+                              </div>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: 13, color: "var(--flour)" }}>{T.name}</div>
+                                <div className="tip" style={{ marginTop: 2 }}>{T.blurb}</div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

@@ -258,8 +258,9 @@ Sliders absent below Expert; benchmark values used silently; an info card explai
 ### R7 — Default fermentation = bulk-then-hold — ✅ DONE
 Standard for every tier. Expert gets the 3-way choice: bulk-then-hold ★ / cold maturation / ambient.
 
-### R8 — Timeline walkthrough with videos / visuals — ⏳ REMAINING
+### R8 — Timeline walkthrough with videos / visuals — ✅ DONE
 Per-step technique visuals (autolyse mix · coil fold · staglio + pirlatura · stretching · launching & turning · poke test · two-stage home bake). In production, `<video>`/embeds work; the artifact version must keep an **animated SVG/CSS fallback** (no network). Per-step optional media slot, graceful text-only fallback.
+**Implementation:** module-level `TECHNIQUES` registry (sibling of `TROUBLES`), each `{ id, name, blurb, Svg, media? }`. Timeline steps carry a `tech: [...ids]` array; a no-print "▸ Voir la technique" toggle (state `openTech`, one step open at a time) expands an animated SVG/CSS figure + FR blurb. The SVG is **always** the rendered fallback (zero network ⇒ identical in artifact & prod); the optional `media` slot renders a `<video>` only when a URL is present (none today), so prod can light up video later without touching logic. Animations honor `prefers-reduced-motion` and are `.no-print`. Mapping: autolyse→pétrissage · coilfold→pointage · pirlatura→boulage · poke→apprêt/détente · stretch+launch→cuisson (hot ovens) · stretch+twostage→cuisson (home ovens).
 
 ### R9 — Output: PDF download + "Save for later" code — ✅ DONE
 - PDF: dedicated `@media print` stylesheet (`.no-print` / `.print-area`) + `window.print()` — one-page recipe ticket + timeline + oven card.
@@ -328,18 +329,18 @@ Per-step technique visuals (autolyse mix · coil fold · staglio + pirlatura · 
 4. ✅ R3.
 5. ✅ R1 (+ unit system requirement).
 6. ✅ R9.
-7. ⏳ R8 (visuals) — last remaining item.
+7. ✅ R8 (technique visuals on the timeline).
 8. ✅ D1 resolved (keep accurate ratios) · D2 sanity-checked, full validation pending reference recipes.
 
 ---
 
 ## 18. Sprint 2 log
 
-- **Scope delivered:** R1 (region + full unit system), R2, R3, R4, R5, R6, R7, R9. Engine untouched and re-validated (4.01 g fresh on the 24 H benchmark — PASS).
+- **Scope delivered:** R1 (region + full unit system), R2, R3, R4, R5, R6, R7, R8, R9 — **Sprint 2 complete**. Engine untouched and re-validated (4.01 g fresh on the 24 H benchmark — PASS).
 - **New requirement folded in:** region drives the **unit system** (US: °F + oz alongside grams), including hardcoded temperatures in oven tip strings via `locTemps()`. Friction deltas are exempt by design.
 - **Decisions:** D1 → keep accurate yeast ratios. D3 → dropped.
 - **Productionization:** repo scaffolded (Vite + React), `window.storage` shim, CI validation gate, GitHub Pages auto-deploy. The component file is byte-identical between artifact and prod.
-- **Remaining:** R8 (technique visuals on the timeline). Then **Sprint 3: design overhaul** — a design brief will be prepared in `docs/` with full client-discovery questions.
+- **Remaining:** none — Sprint 2 closed. Next up **Sprint 3: design overhaul** — a design brief will be prepared in `docs/` with full client-discovery questions.
 
 ---
 
