@@ -286,27 +286,34 @@ Per-step technique visuals (autolyse mix · coil fold · staglio + pirlatura · 
 
 ★ = auto-set to the preferred value at this tier. "slider/choose" = user-editable.
 
-| Control | Amateur | Enthusiast | Expert |
+**REVISED in Sprint 3** (client spec). Two deliberate widenings vs the Sprint 2 matrix, both client-approved:
+(a) Passionate (formerly "Enthusiast") gains the **Schedule page** (room/cold split + ambient) and the **fermentation method** choice — previously Expert-only. (b) Raw chemistry (hydration / salt / FDT / ball-weight sliders) stays **Pizzaiolo-only**; Amateur stays fully automatic. The validated benchmark profile (`bulk-then-hold`, §11) is untouched — it is simply surfaced under the name **Freddo ★**.
+
+UI naming (Sprint 3): expertise tiers = Amateur / **Passionate ★** / Pizzaiolo. Dough tiers (page 2, = the engine `method`/time) = **Classico** (h6) / **Napoletano ★** (h24) / **Maestro** (h48). Fermentation methods (= engine `strategy`) = **Diretto** (ambient) / **Freddo ★** (bulk-then-hold) / **Lento** (cold-maturation).
+
+| Control | Amateur | Passionate | Pizzaiolo |
 |---|---|---|---|
-| Method (gated by time, R3) | choose | choose | choose |
-| Oven type | choose | choose | choose |
-| Pizza diameter | ★ oven sweet spot (≤30) | choose | choose |
+| Dough tier / time (gated by time, R3) | choose | choose | choose |
+| Oven type (dropdown) | choose | choose | choose |
+| Pizza diameter | ★ oven sweet spot (≤30) | slider 20–max | **slider 16–42** |
 | Crust style | ★ classic | choose | choose |
-| # pizzas | choose | choose | choose |
+| # pizzas (± stepper, default 4) | choose | choose | choose |
 | Season | choose | choose | choose |
-| Ambient temp | from season (hidden) | slider | slider |
+| Ambient temp | from season (hidden) | **± buttons** | **± buttons** |
 | Humidity | from season (hidden) | choose | choose |
 | Flour storage | ★ cupboard preset | preset | presets **+ temp slider** |
-| Mixer | ★ hand | choose | choose |
-| Fridge temp | ★ 5 °C (hidden) | ★ 5 °C | slider |
+| Mixer | ★ auto: hand ≤6 / **stand >6** | choose | choose |
+| Fridge temp (shown only if Freddo/Lento) | ★ 5 °C (hidden) | ★ 5 °C | slider |
 | Yeast type | ★ instant | choose | choose |
 | Flour type | ★ auto (00 pizzeria / strong 00 si biga) | choose | choose |
-| **Hydration** | hidden (benchmark) | hidden (benchmark) | **slider** |
+| **Fermentation method** (Diretto/Freddo/Lento) | ★ Freddo (locked) | **choose** | **choose** |
+| **Schedule page** (room/cold split + ambient) | ✗ | **✓** | **✓** |
+| **Hydration** | hidden (benchmark) | hidden (benchmark) | **slider (★ on track)** |
+| **Ball weight** | benchmark | benchmark | **slider (★ on track)** |
 | **Salt** | hidden (benchmark) | hidden (benchmark) | **slider** |
 | **FDT** | hidden (auto) | hidden (auto) | **slider** |
-| **Fermentation strategy** | ★ bulk-then-hold (locked) | ★ bulk-then-hold (locked) | **bulk-then-hold ★ / cold maturation / ambient** |
 | Biga share / temp | benchmark | benchmark | sliders |
-| Room/cold time split | benchmark | benchmark | sliders |
+| Room/cold time split | benchmark | **sliders (Schedule)** | **sliders (Schedule)** |
 
 ---
 
@@ -341,6 +348,20 @@ Per-step technique visuals (autolyse mix · coil fold · staglio + pirlatura · 
 - **Decisions:** D1 → keep accurate yeast ratios. D3 → dropped.
 - **Productionization:** repo scaffolded (Vite + React), `window.storage` shim, CI validation gate, GitHub Pages auto-deploy. The component file is byte-identical between artifact and prod.
 - **Remaining:** none — Sprint 2 closed. Next up **Sprint 3: design overhaul** — a design brief will be prepared in `docs/` with full client-discovery questions.
+
+---
+
+## 19. Sprint 3 log — wizard redesign (in progress)
+
+**Goal:** client-driven UX overhaul of the wizard. Engine §5 **untouched** — `npm run validate` still PASS (4.01 g fresh on the 24 H benchmark). All new concepts map onto existing engine inputs.
+
+- **Bilingual FR/EN** (`lang` state + `tr()`/`L()` helpers, header toggle). Data strings carry `{fr,en}`; `L()` resolves, `tr(fr,en)` for inline copy. `fmtClock(d, lang)` switches locale.
+- **6 pages** (Schedule shown only for Passionate/Pizzaiolo, so Amateur sees 5): 1 Profile (region/units · bake **date** + **time presets** 12/13/18/19/20 + custom · # pizzas ± stepper · level) · 2 Dough (Classico/Napoletano★/Maestro tiers = engine method, ★ marker on hydration/ball sliders · Diretto/Freddo★/Lento method cards with timing + flavor + **checkerboard strip** on select) · 3 Tools (oven **dropdown** · diameter slider 16–42 Pizzaiolo / 20–max Passionate · kitchen season/humidity/**ambient ± buttons** · flour storage + temp · knead pros/cons + water-temp output · fridge temp if Freddo/Lento) · 4 Ingredients (yeast/flour/tomatoes + Pizzaiolo chemistry) · 5 Schedule (interdependent ambient/room/cold preserving the method total + live ingredient quick-total) · 6 Recipe (unchanged + **quick-fix / forever-fix** in the help section).
+- **Global header** on every wizard page: language · units · # pizzas stepper · level switch · per-page Back. Tool availability re-adapts live to the level.
+- **Decisions:** (1) dough tier = fermentation time (1 control). (2) Diretto=ambient, **Freddo★=bulk-then-hold** (validated benchmark renamed), Lento=cold-maturation. (3) §15 widened for Passionate (see §15). (4) Mixer ★ dynamic: hand ≤6 balls, KitchenAid/stand >6.
+- **State added:** `lang`, `ballManual` (Pizzaiolo ball override). Save format bumped to `{v:3}`; loader still accepts `v:2` (missing fields default).
+- **Verification:** `npm run validate` PASS · `npm run build` green · SSR smoke render of 3 tiers × 6 pages (18 scenarios) all clean.
+- **Open / next:** R8 technique visuals flagged by client for polish (separate pass). Self-contained build delivered for client review before further Sprint 3 work.
 
 ---
 
