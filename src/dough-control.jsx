@@ -496,8 +496,11 @@ export default function DoughControl() {
 
   /* ── préférences dynamiques ── */
   const autoMixer = pizzas > 6 ? "stand" : "hand";    // ★ dynamique (≤6 main / >6 robot)
-  const usesFridge = strategy !== "ambient";
   const isBiga = method === "h48";
+  /* Classico (6 h) est trop court pour un vrai travail au froid → Diretto uniquement */
+  const allowedStrategies = method === "h6" ? ["ambient"] : STRATEGY_ORDER;
+  const effStrategy = method === "h6" ? "ambient" : (isAmateur ? "bulkhold" : strategy);
+  const usesFridge = effStrategy !== "ambient";
 
   /* ── R3 : temps disponible + gating méthode ── */
   const hoursUntil = (bakeAt.getTime() - Date.now()) / 3600e3;
@@ -518,7 +521,6 @@ export default function DoughControl() {
   const effHyd = isExpert ? hyd : M.bench.hyd;
   const effSalt = isExpert ? saltP : M.bench.saltP;
   const effFdt = isExpert ? fdt : M.bench.fdt;
-  const effStrategy = isAmateur ? "bulkhold" : strategy;   // Passionné+ choisissent la méthode
   /* temps de pousse : total éditable (page Schedule) ; room + cold somment TOUJOURS au total */
   const proofMax = Math.max(4, Math.floor(Math.min(72, hoursUntil)));
   const effProof = isAmateur ? (M.bench.roomHours + M.bench.coldHours)
@@ -541,20 +543,19 @@ export default function DoughControl() {
 
   /* ── R3 : bascule automatique si la méthode ne tient plus ── */
   useEffect(() => {
-    if (!methodFits(method)) {
-      const fallback = ["h48", "h24", "h6"].find((m) => methodFits(m));
-      if (fallback && fallback !== method) {
-        pickMethod(fallback);
-        setNotice(tr(
-          `⏱ ${METHODS[method].name} ne tient plus dans le délai — bascule automatique sur ${METHODS[fallback].name}.`,
-          `⏱ ${METHODS[method].name} no longer fits — auto-switching to ${METHODS[fallback].name}.`
-        ));
-      } else if (!fallback) {
-        setNotice(tr(
-          "⏱ Moins de 6 h avant la cuisson : aucune méthode ne tient. Repoussez l'heure.",
-          "⏱ Less than 6 h before baking: no method fits. Push the time back."
-        ));
-      }
+    if (methodFits(method)) { setNotice(null); return; }   // assez de temps → on efface l'alerte
+    const fallback = ["h48", "h24", "h6"].find((m) => methodFits(m));
+    if (fallback && fallback !== method) {
+      pickMethod(fallback);
+      setNotice(tr(
+        `⏱ ${METHODS[method].name} ne tient plus dans le délai — bascule automatique sur ${METHODS[fallback].name}.`,
+        `⏱ ${METHODS[method].name} no longer fits — auto-switching to ${METHODS[fallback].name}.`
+      ));
+    } else if (!fallback) {
+      setNotice(tr(
+        "⏱ Moins de 6 h avant la cuisson : aucune méthode ne tient. Repoussez l'heure.",
+        "⏱ Less than 6 h before baking: no method fits. Push the time back."
+      ));
     }
   }, [bakeAt]);
 
@@ -1153,12 +1154,15 @@ export default function DoughControl() {
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {STRATEGY_ORDER.map((id) => {
                   const s = STRATEGIES[id];
+                  const allowed = allowedStrategies.includes(id);
                   const on = effStrategy === id;
-                  const locked = isAmateur;
+                  const locked = isAmateur || !allowed;
                   return (
                     <button key={id} className={`opt ${on ? "on" : ""} ${locked && !on ? "off" : ""}`}
                       onClick={() => !locked && setStrategy(id)}
-                      title={locked ? tr("L'outil choisit pour vous au niveau Amateur.", "The tool picks for you at Amateur level.") : ""}>
+                      title={!allowed
+                        ? tr("Classico (6 h) est trop court pour le froid — Diretto uniquement.", "Classico (6 h) is too short for the fridge — Diretto only.")
+                        : isAmateur ? tr("L'outil choisit pour vous au niveau Amateur.", "The tool picks for you at Amateur level.") : ""}>
                       <div className="optName">
                         {s.it} <span style={{ color: "var(--faint)", fontWeight: 400, fontSize: 12 }}>— {L(s.name)}</span>
                         {s.preferred && <STAR why={L(s.whyPreferred)} />}
@@ -1170,7 +1174,8 @@ export default function DoughControl() {
                   );
                 })}
               </div>
-              {isAmateur && <div className="tip">{tr("Méthode recommandée verrouillée (Freddo). Passez en Passionné pour la changer.", "Recommended method locked (Freddo). Switch to Passionate to change it.")}</div>}
+              {method === "h6" && !isAmateur && <div className="tip">{tr("Classico (6 h) n'autorise que le Diretto — choisissez Napoletano ou Maestro pour fermenter au froid.", "Classico (6 h) only allows Diretto — pick Napoletano or Maestro for cold fermentation.")}</div>}
+              {isAmateur && <div className="tip">{tr("Méthode recommandée verrouillée. Passez en Passionné pour la changer.", "Recommended method locked. Switch to Passionate to change it.")}</div>}
             </div>
 
             <NavRow next={() => setStep(2)} nextLabel={tr("Suivant : les outils", "Next: your tools")} />
