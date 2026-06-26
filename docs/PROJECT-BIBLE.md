@@ -244,7 +244,7 @@ US/EU switch on the pre-start screen. Region-appropriate brand/product examples 
 Pre-start picker: **Amateur** ("Piece of Cake") / **Enthusiast** ("Let's Rock") / **Expert/Pizzaiolo** ("Damn I'm Good"). Tier changeable mid-session via header chips; enforcement via `eff*` derived values (matrix in §15).
 
 ### R3 — Schedule gating by available lead time — ✅ DONE
-Methods that don't fit `hoursUntilBake` (+0.5 h buffer) are grayed/non-clickable with an explanatory tooltip; auto-fallback to the longest fitting method + toast notice.
+Methods that don't fit `hoursUntilBake` are grayed/non-clickable with an explanatory tooltip; auto-fallback to the longest fitting method + toast notice. **Sprint 3:** the +0.5 h prep buffer was **removed** — the window is now the exact fermentation duration (`hoursUntil >= hours`), so e.g. a 24 h 13 m window keeps the 24 h method instead of dropping to 6 h. The greying is purely derived from `hoursUntil`, so adding time back re-enables tiers live.
 
 ### R4 — Flour storage as presets — ✅ DONE
 Cupboard ~21 °C ★ / cool dry place ~18 °C / cellar ~15 °C. Numeric slider Expert-only.
@@ -299,10 +299,10 @@ UI naming (Sprint 3): expertise tiers = Amateur / **Passionate ★** / Pizzaiolo
 | Crust style | ★ classic | choose | choose |
 | # pizzas (± stepper, default 4) | choose | choose | choose |
 | Season | choose | choose | choose |
-| Ambient temp | from season (hidden) | **± buttons** | **± buttons** |
+| Ambient temp | from season (hidden) | **± buttons (14–38 °C)** | **± buttons (14–38 °C)** |
 | Humidity | from season (hidden) | choose | choose |
 | Flour storage | ★ cupboard preset | preset | presets **+ temp slider** |
-| Mixer | ★ auto: hand ≤6 / **stand >6** | choose | choose |
+| Mixer | **choose** (★ hand ≤6 / stand >6) | choose (★ same) | choose (★ same) |
 | Fridge temp (shown only if Freddo/Lento) | ★ 5 °C (hidden) | ★ 5 °C | slider |
 | Yeast type | ★ instant | choose | choose |
 | Flour type | ★ auto (00 pizzeria / strong 00 si biga) | choose | choose |
@@ -361,6 +361,7 @@ UI naming (Sprint 3): expertise tiers = Amateur / **Passionate ★** / Pizzaiolo
 - **Decisions:** (1) dough tier = fermentation time (1 control). (2) Diretto=ambient, **Freddo★=bulk-then-hold** (validated benchmark renamed), Lento=cold-maturation. (3) §15 widened for Passionate (see §15). (4) Mixer ★ dynamic: hand ≤6 balls, KitchenAid/stand >6.
 - **State added:** `lang`, `ballManual` (Pizzaiolo ball override). Save format bumped to `{v:3}`; loader still accepts `v:2` (missing fields default).
 - **Verification:** `npm run validate` PASS · `npm run build` green · SSR smoke render of 3 tiers × 6 pages (18 scenarios) all clean.
+- **Review round 1 (client feedback):** default language → **English**. Start screen: added a quick intro + feature chips, **removed the level cards** (now only on the Profile page), and reframed the code box with an explanation ("Resume a recipe"). Profile: **R3 buffer removed** (auto-switch bug — 24 h 13 m no longer drops to 6 h; tiers re-enable when time is added back) + **Back button returns to the main screen** from step 1. Tools: **kneading is now choosable at Amateur** (`effMixer = mixer`, ★ stays dynamic) and **room temperature goes up to 38 °C**. Global: the **language chip now shows the language you'll switch TO** (🌐 EN when in FR, and vice-versa). Verified: validate PASS · build green · gating unit-check 7/7 · SSR smoke 2 langs × 3 tiers × 6 pages (36) clean.
 - **Open / next:** R8 technique visuals flagged by client for polish (separate pass). Self-contained build delivered for client review before further Sprint 3 work.
 
 ---

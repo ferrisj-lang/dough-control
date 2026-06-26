@@ -422,7 +422,7 @@ const TIME_PRESETS = [12, 13, 18, 19, 20];
 export default function DoughControl() {
   /* ── méta ── */
   const [started, setStarted] = useState(false);
-  const [lang, setLang] = useState("fr");
+  const [lang, setLang] = useState("en");
   const [region, setRegion] = useState("eu");
   const [tier, setTier] = useState("enthusiast");
   const [step, setStep] = useState(0);
@@ -500,7 +500,7 @@ export default function DoughControl() {
   const seasonData = SEASONS.find((s) => s.id === season);
   const effAmbient = isAmateur ? seasonData.amb : ambient;
   const effHumidity = isAmateur ? seasonData.hum : humidity;
-  const effMixer = isAmateur ? autoMixer : mixer;
+  const effMixer = mixer; // Sprint 3 : choix du pétrissage ouvert à tous les niveaux (★ reste dynamique via autoMixer)
   const effFridge = isExpert ? fridgeTemp : 5;
   const effYeast = isAmateur ? "instant" : yeastType;
   const flourAuto = method === "h48" ? "strong00" : "pizzeria00";
@@ -522,7 +522,7 @@ export default function DoughControl() {
 
   /* ── R3 : gating des méthodes par temps disponible ── */
   const hoursUntil = (bakeAt.getTime() - Date.now()) / 3600e3;
-  const methodFits = (m) => hoursUntil >= METHODS[m].hours + 0.5;
+  const methodFits = (m) => hoursUntil >= METHODS[m].hours; // fenêtre = durée de fermentation exacte (buffer retiré, Sprint 3)
   useEffect(() => {
     if (!methodFits(method)) {
       const fallback = ["h48", "h24", "h6"].find((m) => methodFits(m));
@@ -534,8 +534,8 @@ export default function DoughControl() {
         ));
       } else if (!fallback) {
         setNotice(tr(
-          "⏱ Moins de 6 h 30 avant la cuisson : aucune méthode ne tient. Repoussez l'heure.",
-          "⏱ Less than 6 h 30 before baking: no method fits. Push the time back."
+          "⏱ Moins de 6 h avant la cuisson : aucune méthode ne tient. Repoussez l'heure.",
+          "⏱ Less than 6 h before baking: no method fits. Push the time back."
         ));
       }
     }
@@ -875,7 +875,7 @@ export default function DoughControl() {
         <div style={{ flex: 1 }} />
         <div className="hgrp">
           <button className="chip sm" onClick={() => setLang(lang === "fr" ? "en" : "fr")} title={tr("Langue", "Language")}>
-            {lang === "fr" ? "FR" : "EN"}
+            🌐 {lang === "fr" ? "EN" : "FR"}
           </button>
           <button className="chip sm" onClick={() => setRegion(region === "eu" ? "us" : "eu")} title={tr("Unités / région", "Units / region")}>
             {R.flag} {region === "us" ? "°F/oz" : "°C/g"}
@@ -901,8 +901,9 @@ export default function DoughControl() {
   );
 
   const BackBtn = () => (
-    <button className="btn ghost no-print" disabled={step === 0} onClick={() => setStep(Math.max(0, step - 1))}>
-      ← {tr("Retour", "Back")}
+    <button className="btn ghost no-print"
+      onClick={() => (step === 0 ? setStarted(false) : setStep(step - 1))}>
+      ← {step === 0 ? tr("Accueil", "Main menu") : tr("Retour", "Back")}
     </button>
   );
   const NavRow = ({ next, nextLabel }) => (
@@ -938,11 +939,22 @@ export default function DoughControl() {
               DOUGH <span style={{ color: "var(--ember)" }}>CONTROL</span>
             </div>
             <div style={{ flex: 1 }} />
-            <button className="chip sm" onClick={() => setLang(lang === "fr" ? "en" : "fr")}>{lang === "fr" ? "FR" : "EN"}</button>
+            <button className="chip sm" onClick={() => setLang(lang === "fr" ? "en" : "fr")}>🌐 {lang === "fr" ? "EN" : "FR"}</button>
           </div>
-          <div style={{ color: "var(--dim)", marginTop: 8, marginBottom: 28 }}>
-            {tr("De « pizza samedi 20 h » à une recette au gramme près, planifiée à rebours.",
-                "From “pizza Saturday 8pm” to a gram-precise recipe, planned backwards.")}
+          <div style={{ color: "var(--dim)", marginTop: 8, marginBottom: 18, lineHeight: 1.5 }}>
+            {tr(
+              "Dough Control transforme une heure de cuisson en une recette napolitaine au gramme près. Dites-lui quand vous voulez manger, votre matériel et votre cuisine — il dimensionne la pâte, calcule la dose de levure et construit votre planning, étape par étape.",
+              "Dough Control turns a target bake time into a gram-precise Neapolitan dough recipe. Tell it when you want to eat, your gear and your kitchen — it sizes the dough, works out the yeast dose, and builds your timeline, step by step."
+            )}
+          </div>
+          <div className="pillrow" style={{ marginBottom: 26 }}>
+            {[
+              tr("⏱ Planifié à rebours depuis l'heure de cuisson", "⏱ Planned backwards from your bake time"),
+              tr("⚖ Pesé au gramme près", "⚖ Weighed to the gram"),
+              tr("🔥 Optimisé fours Ooni / Gozney", "🔥 Tuned for Ooni / Gozney ovens"),
+            ].map((b) => (
+              <span key={b} className="chip sm" style={{ cursor: "default" }}>{b}</span>
+            ))}
           </div>
 
           <div className="card">
@@ -961,29 +973,23 @@ export default function DoughControl() {
           </div>
 
           <div className="card">
-            <div className="lbl">{tr("Votre niveau", "Your level")}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {Object.entries(TIERS).map(([id, t]) => (
-                <button key={id} className={`opt ${tier === id ? "on" : ""}`} onClick={() => setTier(id)}>
-                  <div className="optName">
-                    {t.icon} {L(t.name)} <span style={{ color: "var(--faint)", fontWeight: 400 }}>— "{t.flavor}"</span>
-                    {t.preferred && <STAR why={tr("Le meilleur compromis pour la plupart des gens.", "The best fit for most people.")} />}
-                  </div>
-                  <div className="optSub">{L(t.desc)}</div>
-                </button>
-              ))}
+            <div className="lbl">{tr("Reprendre une recette", "Resume a recipe")}</div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input className="txt" style={{ width: 140, textTransform: "uppercase" }}
+                placeholder={tr("CODE…", "CODE…")} maxLength={6} value={loadInput}
+                onChange={(e) => setLoadInput(e.target.value)} />
+              <button className="btn ghost" onClick={loadRecipe}>{tr("Charger", "Load")}</button>
             </div>
+            <div className="tip">
+              {tr(
+                "Chaque recette sauvegardée reçoit un code à 6 caractères (sur le dernier écran). Saisissez-le ici pour recharger la recette à l'identique, sur n'importe quel appareil. Sinon, démarrez une nouvelle recette ci-dessous.",
+                "Every saved recipe gets a 6-character code (on the final screen). Enter it here to reload that exact recipe on any device. Otherwise, start a new recipe below."
+              )}
+            </div>
+            {storageMsg && <div className="tip" style={{ marginTop: 8, color: "var(--gold)" }}>{storageMsg}</div>}
           </div>
 
-          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-            <button className="btn" onClick={() => { setStep(0); setStarted(true); }}>{tr("Commencer", "Start")} →</button>
-            <div style={{ flex: 1 }} />
-            <input className="txt" style={{ width: 130, textTransform: "uppercase" }}
-              placeholder={tr("CODE…", "CODE…")} maxLength={6} value={loadInput}
-              onChange={(e) => setLoadInput(e.target.value)} />
-            <button className="btn ghost" onClick={loadRecipe}>{tr("Charger", "Load")}</button>
-          </div>
-          {storageMsg && <div className="tip" style={{ marginTop: 10, color: "var(--gold)" }}>{storageMsg}</div>}
+          <button className="btn" onClick={() => { setStep(0); setStarted(true); }}>{tr("Commencer une recette", "Start a recipe")} →</button>}
         </div>
       </div>
     );
@@ -1203,7 +1209,7 @@ export default function DoughControl() {
               ) : (
                 <>
                   <div className="lbl" style={{ marginTop: 14 }}>{tr("Température ambiante", "Room temperature")}</div>
-                  <Stepper value={ambient} set={setAmbient} min={14} max={32} fmt={(v) => fmtTemp(v, region)} />
+                  <Stepper value={ambient} set={setAmbient} min={14} max={38} fmt={(v) => fmtTemp(v, region)} />
                   <div className="lbl" style={{ marginTop: 14 }}>{tr("Humidité", "Humidity")}</div>
                   <div className="pillrow">
                     {[["dry", tr("Sec", "Dry")], ["normal", tr("Normal", "Normal")], ["humid", tr("Humide", "Humid")]].map(([id, n]) => (
@@ -1237,26 +1243,23 @@ export default function DoughControl() {
 
             <div className="card">
               <div className="lbl">{tr("Comment pétrissez-vous ?", "How do you knead?")}</div>
-              {isAmateur ? (
-                <div className="tip">
-                  <span className="val">{L(MIXERS.find((m) => m.id === autoMixer).name)}</span> <STAR why={L(MIXERS.find((m) => m.id === autoMixer).why)} /> — {L(MIXERS.find((m) => m.id === autoMixer).tip)}
-                </div>
-              ) : (
-                <>
-                  <div className="pillrow">
-                    {MIXERS.map((m) => (
-                      <button key={m.id} className={`chip ${effMixer === m.id ? "on" : ""}`} onClick={() => setMixer(m.id)}>
-                        {L(m.name)}{m.id === autoMixer && <STAR why={L(m.why) || tr("Recommandé pour votre quantité de pâtons.", "Recommended for your batch size.")} />}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="tip">
-                    {L(MIXERS.find((m) => m.id === effMixer).tip)}
-                    {effMixer === "spiral" && ` ${L(MIXERS[2].best)}`}
-                  </div>
-                  <div className="why">→ {tr("Eau à", "Water at")} <span className="mono">{fmtTemp(Math.round(calc.waterTemp), region)}</span> {tr("(intègre la friction de votre méthode)", "(includes your method's friction)")}</div>
-                </>
-              )}
+              <div className="pillrow">
+                {MIXERS.map((m) => (
+                  <button key={m.id} className={`chip ${effMixer === m.id ? "on" : ""}`} onClick={() => setMixer(m.id)}>
+                    {L(m.name)}{m.id === autoMixer && <STAR why={L(m.why) || tr("Recommandé pour votre quantité de pâtons.", "Recommended for your batch size.")} />}
+                  </button>
+                ))}
+              </div>
+              <div className="tip">
+                {L(MIXERS.find((m) => m.id === effMixer).tip)}
+                {effMixer === "spiral" && ` ${L(MIXERS[2].best)}`}
+              </div>
+              <div className="why">
+                ★ {L(MIXERS.find((m) => m.id === autoMixer).name)} — {pizzas > 6
+                  ? tr("recommandé au-delà de 6 pâtons.", "recommended past 6 balls.")
+                  : tr("recommandé jusqu'à 6 pâtons.", "recommended up to 6 balls.")}
+                {" "}→ {tr("Eau à", "Water at")} <span className="mono">{fmtTemp(Math.round(calc.waterTemp), region)}</span>.
+              </div>
             </div>
 
             {usesFridge && (
@@ -1371,7 +1374,7 @@ export default function DoughControl() {
 
               <div style={{ height: 12 }} />
               <div className="lbl">{tr("Température ambiante", "Room temperature")}</div>
-              <Stepper value={ambient} set={setAmbient} min={14} max={32} fmt={(v) => fmtTemp(v, region)} />
+              <Stepper value={ambient} set={setAmbient} min={14} max={38} fmt={(v) => fmtTemp(v, region)} />
 
               {method === "h48" ? (
                 <div className="tip" style={{ marginTop: 14 }}>
