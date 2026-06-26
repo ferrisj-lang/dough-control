@@ -244,7 +244,7 @@ US/EU switch on the pre-start screen. Region-appropriate brand/product examples 
 Pre-start picker: **Amateur** ("Piece of Cake") / **Enthusiast** ("Let's Rock") / **Expert/Pizzaiolo** ("Damn I'm Good"). Tier changeable mid-session via header chips; enforcement via `eff*` derived values (matrix in §15).
 
 ### R3 — Schedule gating by available lead time — ✅ DONE
-Methods that don't fit `hoursUntilBake` are grayed/non-clickable with an explanatory tooltip; auto-fallback to the longest fitting method + toast notice. **Sprint 3:** the +0.5 h prep buffer was **removed** — the window is now the exact fermentation duration (`hoursUntil >= hours`), so e.g. a 24 h 13 m window keeps the 24 h method instead of dropping to 6 h. The greying is purely derived from `hoursUntil`, so adding time back re-enables tiers live.
+Methods that don't fit `hoursUntilBake` are grayed/non-clickable with an explanatory tooltip; auto-fallback to the longest fitting method + toast notice. **Sprint 3 final model:** the hard gate is the **exact fermentation duration** (`methodFits = hoursUntil >= hours`) — so a 24 h 13 m window keeps the 24 h method (no silent drop to 6 h), and greying is purely derived from `hoursUntil` (adding time re-enables tiers live). The **+0.5 h prep buffer survives as an explicit advisory, not a silent gate**: `methodTight = fits && hoursUntil < hours + PREP_BUFFER` shows a gold "tight on prep" flag on borderline tiers, and the bake-date card explains the ~30 min reserve (mixing + balling + preheat). This keeps the buffer's wisdom visible without the confusing rejection.
 
 ### R4 — Flour storage as presets — ✅ DONE
 Cupboard ~21 °C ★ / cool dry place ~18 °C / cellar ~15 °C. Numeric slider Expert-only.
@@ -313,7 +313,7 @@ UI naming (Sprint 3): expertise tiers = Amateur / **Passionate ★** / Pizzaiolo
 | **Salt** | hidden (benchmark) | hidden (benchmark) | **slider** |
 | **FDT** | hidden (auto) | hidden (auto) | **slider** |
 | Biga share / temp | benchmark | benchmark | sliders |
-| Room/cold time split | benchmark | **sliders (Schedule)** | **sliders (Schedule)** |
+| Proof total + room/cold split | benchmark | **Schedule: ± total + coupled sliders** | **Schedule: ± total + coupled sliders** |
 
 ---
 
@@ -362,6 +362,7 @@ UI naming (Sprint 3): expertise tiers = Amateur / **Passionate ★** / Pizzaiolo
 - **State added:** `lang`, `ballManual` (Pizzaiolo ball override). Save format bumped to `{v:3}`; loader still accepts `v:2` (missing fields default).
 - **Verification:** `npm run validate` PASS · `npm run build` green · SSR smoke render of 3 tiers × 6 pages (18 scenarios) all clean.
 - **Review round 1 (client feedback):** default language → **English**. Start screen: added a quick intro + feature chips, **removed the level cards** (now only on the Profile page), and reframed the code box with an explanation ("Resume a recipe"). Profile: **R3 buffer removed** (auto-switch bug — 24 h 13 m no longer drops to 6 h; tiers re-enable when time is added back) + **Back button returns to the main screen** from step 1. Tools: **kneading is now choosable at Amateur** (`effMixer = mixer`, ★ stays dynamic) and **room temperature goes up to 38 °C**. Global: the **language chip now shows the language you'll switch TO** (🌐 EN when in FR, and vice-versa). Verified: validate PASS · build green · gating unit-check 7/7 · SSR smoke 2 langs × 3 tiers × 6 pages (36) clean.
+- **Review round 2 (client feedback):** (1) **Prep buffer restored as an advisory** — hard gate stays at the exact fermentation duration, but the +0.5 h reserve is now surfaced (gold "tight on prep" flag on borderline tiers + an explanatory note on the bake-date card) instead of silently dropping the method. (2) **Schedule proof-time model fixed** — added a **± Total proof time** stepper (state `proofTotal`, default = the method's room+cold; clamped to the available window via `proofMax`), and the room/cold sliders are now **coupled to always sum to the total** (`effRoom`+`effCold` ≡ `effProof`; Diretto = all room, no cold slider; biga handled automatically). Save bumped fields (`proofTotal`) under the same `{v:3}`. Verified: validate PASS · build green · gate/buffer unit-check 5/5 · proof-sum invariant 1219/1219 exact · SSR smoke 36 variants (method+strategy varied) clean.
 - **Open / next:** R8 technique visuals flagged by client for polish (separate pass). Self-contained build delivered for client review before further Sprint 3 work.
 
 ---

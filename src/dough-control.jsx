@@ -417,6 +417,9 @@ const toTimeInput = (d) => `${p2(d.getHours())}:${p2(d.getMinutes())}`;
 
 const STAR = ({ why }) => <span className="star" title={why || "★"}>★</span>;
 const TIME_PRESETS = [12, 13, 18, 19, 20];
+/* Marge de préparation (mélange + boulage + préchauffage) en plus de la pousse.
+   Sprint 3 : informative (jamais un gate silencieux) — voir §13 R3. */
+const PREP_BUFFER = 0.5;
 
 /* ════════════════════════════════════════════════════════════════ */
 export default function DoughControl() {
@@ -464,6 +467,7 @@ export default function DoughControl() {
   const [strategy, setStrategy] = useState("bulkhold");
   const [roomHours, setRoomHours] = useState(14);
   const [coldHours, setColdHours] = useState(10);
+  const [proofTotal, setProofTotal] = useState(24); // total de pousse éditable (room+cold), défaut = méthode
   const [bigaPct, setBigaPct] = useState(30);
   const [bigaTemp, setBigaTemp] = useState(18);
 
@@ -493,6 +497,12 @@ export default function DoughControl() {
   /* ── préférences dynamiques ── */
   const autoMixer = pizzas > 6 ? "stand" : "hand";    // ★ dynamique (≤6 main / >6 robot)
   const usesFridge = strategy !== "ambient";
+  const isBiga = method === "h48";
+
+  /* ── R3 : temps disponible + gating méthode ── */
+  const hoursUntil = (bakeAt.getTime() - Date.now()) / 3600e3;
+  const methodFits = (m) => hoursUntil >= METHODS[m].hours;                                 // gate dur = durée de fermentation exacte
+  const methodTight = (m) => methodFits(m) && hoursUntil < METHODS[m].hours + PREP_BUFFER;  // tient mais marge prép. < 30 min
 
   /* ── valeurs effectives selon le niveau (§15 révisé Sprint 3) ── */
   const effCrust = isAmateur ? "classic" : crust;
@@ -509,8 +519,17 @@ export default function DoughControl() {
   const effSalt = isExpert ? saltP : M.bench.saltP;
   const effFdt = isExpert ? fdt : M.bench.fdt;
   const effStrategy = isAmateur ? "bulkhold" : strategy;   // Passionné+ choisissent la méthode
-  const effRoom = isAmateur ? M.bench.roomHours : roomHours; // Passionné+ ont la page Schedule
-  const effCold = isAmateur ? M.bench.coldHours : (effStrategy === "ambient" ? 0 : coldHours);
+  /* temps de pousse : total éditable (page Schedule) ; room + cold somment TOUJOURS au total */
+  const proofMax = Math.max(4, Math.floor(Math.min(72, hoursUntil)));
+  const effProof = isAmateur ? (M.bench.roomHours + M.bench.coldHours)
+    : isBiga ? (roomHours + coldHours)
+    : clamp(proofTotal, 2, proofMax);
+  const effRoom = isAmateur ? M.bench.roomHours
+    : isBiga ? roomHours
+    : (effStrategy === "ambient" ? effProof : clamp(roomHours, 0, effProof));
+  const effCold = isAmateur ? M.bench.coldHours
+    : isBiga ? coldHours
+    : (effStrategy === "ambient" ? 0 : Math.max(0, effProof - effRoom));
   const effBigaPct = isExpert ? bigaPct : (M.bench.bigaPct || 30);
   const effBigaTemp = isExpert ? bigaTemp : (M.bench.bigaTemp || 18);
   const storage = STORAGE_PRESETS.find((s) => s.id === storagePreset);
@@ -520,9 +539,7 @@ export default function DoughControl() {
   const baseBall = ballWeight(effDia, CRUSTS.find((c) => c.id === effCrust).den);
   const effBall = isExpert && ballManual != null ? clamp(ballManual, 150, 420) : baseBall;
 
-  /* ── R3 : gating des méthodes par temps disponible ── */
-  const hoursUntil = (bakeAt.getTime() - Date.now()) / 3600e3;
-  const methodFits = (m) => hoursUntil >= METHODS[m].hours; // fenêtre = durée de fermentation exacte (buffer retiré, Sprint 3)
+  /* ── R3 : bascule automatique si la méthode ne tient plus ── */
   useEffect(() => {
     if (!methodFits(method)) {
       const fallback = ["h48", "h24", "h6"].find((m) => methodFits(m));
@@ -546,25 +563,20 @@ export default function DoughControl() {
     const b = METHODS[id].bench;
     setMethod(id);
     setHyd(b.hyd); setSaltP(b.saltP); setFdt(b.fdt);
-    setRoomHours(b.roomHours); setColdHours(b.coldHours);
+    setRoomHours(b.roomHours); setColdHours(b.coldHours); setProofTotal(b.roomHours + b.coldHours);
     if (b.bigaPct) { setBigaPct(b.bigaPct); setBigaTemp(b.bigaTemp); }
     if (id !== "h48" && flour === "strong00") setFlour("pizzeria00");
     if (id === "h48") setFlour("strong00");
   }
 
-  /* ── curseurs temps couplés (budget §5.9) ── */
-  function setRoom(v) {
-    const max = M.hours - (method === "h48" ? 12 : 0);
-    const r = clamp(v, 1, max);
-    setRoomHours(r);
-    if (r + coldHours > max) setColdHours(max - r);
-  }
-  function setCold(v) {
-    const max = M.hours - (method === "h48" ? 12 : 0);
-    const c = clamp(v, 0, max - 1);
-    setColdHours(c);
-    if (roomHours + c > max) setRoomHours(max - c);
-  }
+  /* ── page Schedule : total de pousse éditable, split room/cold toujours couplé ── */
+  const setProofTotalClamped = (v) => {
+    const t = clamp(v, 2, proofMax);
+    setProofTotal(t);
+    if (roomHours > t) setRoomHours(t);
+  };
+  const setRoomSplit = (v) => setRoomHours(clamp(v, 0, effProof));
+  const setColdSplit = (v) => setRoomHours(clamp(effProof - v, 0, effProof));
 
   /* ── bake date / time helpers ── */
   const setBakeDate = (val) => {
@@ -683,7 +695,7 @@ export default function DoughControl() {
   const collectState = () => ({
     v: 3, lang, region, tier, method, bakeAt: bakeAt.getTime(), oven, targetDia, crust, pizzas, ballManual,
     season, ambient, humidity, storagePreset, flourTempManual, mixer, fridgeTemp,
-    yeastType, flour, hyd, saltP, fdt, strategy, roomHours, coldHours, bigaPct, bigaTemp,
+    yeastType, flour, hyd, saltP, fdt, strategy, roomHours, coldHours, proofTotal, bigaPct, bigaTemp,
   });
   async function saveRecipe() {
     try {
@@ -710,7 +722,9 @@ export default function DoughControl() {
       setFlourTempManual(st.flourTempManual); setMixer(st.mixer); setFridgeTemp(st.fridgeTemp);
       setYeastType(st.yeastType); setFlour(st.flour); setHyd(st.hyd); setSaltP(st.saltP);
       setFdt(st.fdt); setStrategy(st.strategy); setRoomHours(st.roomHours);
-      setColdHours(st.coldHours); setBigaPct(st.bigaPct); setBigaTemp(st.bigaTemp);
+      setColdHours(st.coldHours);
+      setProofTotal(st.proofTotal ?? (METHODS[st.method].bench.roomHours + METHODS[st.method].bench.coldHours));
+      setBigaPct(st.bigaPct); setBigaTemp(st.bigaTemp);
       setStarted(true); setStep(LAST_STEP); setStorageMsg(tr(`Recette ${code} chargée ✓`, `Recipe ${code} loaded ✓`)); setLoadInput("");
     } catch {
       setStorageMsg(tr(`Code ${code} introuvable.`, `Code ${code} not found.`));
@@ -1050,6 +1064,12 @@ export default function DoughControl() {
                 {tr("Soit dans", "That's in")} <span className="mono val">{hoursUntil > 0 ? fmtDur(hoursUntil) : "—"}</span>.
                 {tr(" Tout le planning sera calculé à rebours depuis ce moment.", " The whole plan is computed backwards from this moment.")}
               </div>
+              <div className="tip">
+                ⏲ {tr(
+                  "Prévoyez ~30 min en plus du temps de pousse pour le mélange, le boulage et le préchauffage. Une pâte marquée « serré » tient dans le délai mais laisse peu de marge.",
+                  "Allow ~30 min on top of the proof time for mixing, balling and preheat. A dough tier flagged “tight” still fits your window but leaves little slack."
+                )}
+              </div>
             </div>
 
             <div className="card">
@@ -1088,17 +1108,21 @@ export default function DoughControl() {
               <div className="grid3">
                 {DOUGH_TIERS.map((d) => {
                   const fits = methodFits(d.id);
+                  const tight = methodTight(d.id);
                   const bench = METHODS[d.id].bench;
                   return (
                     <button key={d.id} className={`opt ${method === d.id ? "on" : ""} ${!fits ? "off" : ""}`}
                       onClick={() => fits && pickMethod(d.id)}
-                      title={!fits ? tr(`Nécessite ≥ ${METHODS[d.id].hours} h`, `Needs ≥ ${METHODS[d.id].hours} h`) : L(d.hint)}>
+                      title={!fits ? tr(`Nécessite ≥ ${METHODS[d.id].hours} h (+ ~30 min de prép.)`, `Needs ≥ ${METHODS[d.id].hours} h (+ ~30 min prep)`) : L(d.hint)}>
                       <div className="optName display" style={{ fontSize: 19 }}>
                         {d.name}{d.preferred && fits && <STAR why={L(d.whyPreferred)} />}
                       </div>
                       <div className="optSub">{L(d.tag)} · {bench.hyd}% {tr("hyd", "hyd")}</div>
                       {!fits && <div className="tip" style={{ color: "var(--warn)" }}>
                         {tr(`≥ ${METHODS[d.id].hours} h requis`, `needs ≥ ${METHODS[d.id].hours} h`)} · {fmtDur(Math.max(0, hoursUntil))} {tr("dispo", "avail")}
+                      </div>}
+                      {fits && tight && <div className="tip" style={{ color: "var(--gold)" }}>
+                        ⏲ {tr("serré côté prép.", "tight on prep")}
                       </div>}
                     </button>
                   );
@@ -1367,32 +1391,40 @@ export default function DoughControl() {
           <>
             <div className="card">
               <div className="lbl">{tr("Jouez avec votre planning", "Play with your schedule")}</div>
-              <div className="tip" style={{ marginTop: 0 }}>
-                {tr("Répartissez le temps total entre température ambiante et frigo. Les deux curseurs se compensent pour respecter le total de la méthode", "Split the total time between room temperature and fridge. The two sliders trade off to keep the method's total")}
-                {" "}(<span className="mono val">{M.hours - (method === "h48" ? 12 : 0)} h</span>{method === "h48" ? tr(" + biga", " + biga") : ""}).
-              </div>
 
-              <div style={{ height: 12 }} />
-              <div className="lbl">{tr("Température ambiante", "Room temperature")}</div>
+              <div className="lbl" style={{ marginTop: 6 }}>{tr("Température ambiante", "Room temperature")}</div>
               <Stepper value={ambient} set={setAmbient} min={14} max={38} fmt={(v) => fmtTemp(v, region)} />
 
-              {method === "h48" ? (
+              {isBiga ? (
                 <div className="tip" style={{ marginTop: 14 }}>
-                  {tr("En mode biga (48 h), la fenêtre ambiante/frigo est gérée automatiquement autour de la biga.", "In biga mode (48 h), the room/fridge window is handled automatically around the biga.")}
+                  {tr("En mode biga (Maestro), la fenêtre ambiante/frigo est gérée automatiquement autour de la biga.", "In biga mode (Maestro), the room/fridge window is handled automatically around the biga.")}
                 </div>
               ) : (
-                <div style={{ marginTop: 14 }}>
-                  <Slider label={tr("Heures à température ambiante", "Hours at room temperature")} value={effRoom} set={setRoom}
-                    min={1} max={M.hours} step={0.5} unit=" h" />
-                  {usesFridge && (
-                    <Slider label={tr("Heures au froid", "Hours in the fridge")} value={effCold} set={setCold}
-                      min={0} max={M.hours - 1} step={0.5} unit=" h" />
-                  )}
+                <>
+                  <div className="lbl" style={{ marginTop: 16 }}>{tr("Temps de pousse total", "Total proof time")}</div>
+                  <Stepper value={effProof} set={setProofTotalClamped} min={2} max={proofMax} fmt={(v) => `${v} h`} />
                   <div className="tip">
-                    {tr("Total utilisé", "Total used")} : <span className="mono val">{(effRoom + effCold).toFixed(1)} h</span> / {M.hours} h
-                    {!usesFridge && tr(" — méthode Diretto : pas de froid.", " — Diretto method: no fridge.")}
+                    {tr("Par défaut, le temps de la pâte choisie", "Defaults to your chosen dough time")} ({doughTier.name}).
+                    {effProof < (M.bench.roomHours + M.bench.coldHours) && tr(" Réduit pour tenir dans le délai disponible.", " Reduced to fit your available window.")}
                   </div>
-                </div>
+
+                  {usesFridge ? (
+                    <div style={{ marginTop: 14 }}>
+                      <div className="tip" style={{ marginTop: 0 }}>{tr("Répartissez ce total entre ambiante et frigo — les deux curseurs somment toujours au total.", "Split that total between room and fridge — the two sliders always sum to the total.")}</div>
+                      <Slider label={tr("Heures à température ambiante", "Hours at room temperature")} value={effRoom} set={setRoomSplit}
+                        min={0} max={effProof} step={0.5} unit=" h" />
+                      <Slider label={tr("Heures au froid", "Hours in the fridge")} value={effCold} set={setColdSplit}
+                        min={0} max={effProof} step={0.5} unit=" h" />
+                      <div className="tip">
+                        {tr("Ambiante", "Room")} <span className="mono val">{effRoom.toFixed(1)} h</span> + {tr("froid", "fridge")} <span className="mono val">{effCold.toFixed(1)} h</span> = <span className="mono val">{effProof} h</span> ✓
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="tip" style={{ marginTop: 12 }}>
+                      {tr("Méthode Diretto : tout se passe à température ambiante", "Diretto method: everything at room temperature")} (<span className="mono val">{effProof} h</span>).
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
