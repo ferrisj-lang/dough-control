@@ -6,7 +6,7 @@
 <title>Dough Control — Napoli direction</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#F7EEDD;--surface:#FFFFFF;--surface-2:#F3EAD8;
@@ -15,7 +15,7 @@
   --green:#1E8A4C;
   --radius:12px;--radius-sm:8px;
   --shadow-1:0 2px 8px rgba(60,30,10,.06);--shadow-2:0 8px 22px rgba(60,30,10,.14);
-  --display:'Anton',sans-serif;--logo:'Baloo 2',sans-serif;--body:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  --display:'Anton',sans-serif;--body:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
@@ -33,12 +33,17 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
 .tricolore::after{background:linear-gradient(to right,var(--accent) 0 33%,#fff 33% 66%,var(--green) 66% 100%)}
 
 .head{background:var(--surface);border-bottom:1px solid var(--line)}
-.head .inner{max-width:480px;margin:0 auto;padding:16px 18px 12px;display:flex;align-items:baseline;gap:10px}
-.logo{font-family:var(--logo);font-weight:800;font-size:30px;letter-spacing:.3px;line-height:1;
-  text-transform:uppercase;color:var(--accent);text-shadow:2px 2px 0 var(--accent-deep)} /* fun stacked depth, both words tomato */
-.logo .o{color:var(--accent)}
-.head .units{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--dim);
+.head .inner{max-width:480px;margin:0 auto;padding:18px 18px 14px;position:relative;text-align:center}
+.head .units{position:absolute;top:14px;right:18px;font-family:var(--mono);font-size:12px;color:var(--dim);
   border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+/* emblem logo lockup (ref: "La Pizzeteria") — both words tomato, condensed display */
+.emblem{display:inline-block;color:var(--accent);line-height:1}
+.eline{display:flex;align-items:center;justify-content:center;gap:13px;margin-bottom:1px}
+.estd{font-family:var(--display);font-size:15px;letter-spacing:1px;text-transform:uppercase}
+.esmall{font-family:var(--display);font-size:25px;letter-spacing:.5px;text-transform:uppercase}
+.ebig{font-family:var(--display);font-size:52px;letter-spacing:.5px;text-transform:uppercase;line-height:.82}
+.etag{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--accent);margin-top:9px}
 
 .canvas{max-width:480px;margin:0 auto;padding:20px 18px}
 .kicker{font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent);margin:26px 2px 10px}
@@ -130,8 +135,12 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
 <body>
   <div class="head">
     <div class="inner">
-      <div class="logo">DOUGH <span class="o">CONTROL</span></div>
       <span class="units">°C / g</span>
+      <div class="emblem">
+        <div class="eline"><span class="estd">Estd.</span><span class="esmall">Dough</span><span class="estd">2024</span></div>
+        <div class="ebig">Control</div>
+        <div class="etag">Gram-precise Neapolitan dough</div>
+      </div>
     </div>
     <div class="checker"></div>
   </div>
@@ -139,7 +148,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
   <div class="note">Napoli direction — light only. Anton (hero caps) · Inter (UI) · JetBrains Mono (data). Toggle nothing: this is the single locked direction for sign-off.</div>
 
   <div class="canvas">
-    <div class="tag">From a target bake time to a gram-precise Neapolitan dough.</div>
+    <div class="tag">Tell it when you want to eat — it plans the whole bake backwards, to the gram.</div>
 
     <div class="kicker">① Wizard — dough profile</div>
     <div class="dots">
