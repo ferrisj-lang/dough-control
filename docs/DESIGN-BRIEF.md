@@ -38,5 +38,47 @@ Legibility of numeric data · personality/memorability · light+dark quality · 
 3. Implement in `src/dough-control.jsx` (tokens + component restyle), keeping engine/logic untouched; re-run validate + build + SSR smoke.
 4. R8 technique-visual polish folds into the chosen system.
 
+## LOCKED — Layer 1 project brief: "Napoli" (references Baseline v1.0)
+
+**Personality:** confident, warm, modern Neapolitan pizzeria — poster-bold brand moments over a calm, legible, data-first interface. Inspired by client reference visuals (Pizza Margherita Napoli poster, Holy Napoli packaging, ASAP/Buba's pizzeria graphics): cream grounds, tomato-red headlines, tricolore + red/cream checkerboard devices.
+
+### Documented exceptions to Baseline v1.0 (client-approved)
+- **Light-only** (exception to §6.4 dark-mode-first). Rationale: client directive; kitchen/daylight use; reduced maintenance. Architecture stays token-based so a dark map can be added later without touching components.
+- **Hero typography** (uses the §5.1 / §5.3 "hero/marketing" allowance): a heavy condensed CAPS display face is permitted **only** for the logo, page/hero titles and the recipe-ticket title. All other UI text obeys the baseline (sentence case, weights 400/500/600, caps only for ≤11px micro-labels).
+- **Decorative color** (per §6.2 allowance): tricolore (green/white/red) hairline + red/cream checkerboard, **scoped** to: app header/footer strip, recipe-ticket header, and the selected fermentation-method card. Nowhere else.
+
+### Color tokens (light)
+| Role | Token | Hex |
+|---|---|---|
+| Canvas (neutral) | `--bg` | `#F7EEDD` (warm cream) |
+| Card surface | `--surface` | `#FFFFFF` |
+| Inset surface | `--surface-2` | `#F3EAD8` |
+| Text primary (neutral) | `--ink` | `#2B1A12` |
+| Text secondary | `--dim` | `#6B5848` |
+| Text faint / micro | `--faint` | `#9A8772` |
+| Border | `--line` | `#E7D9C2` |
+| **Accent** (brand/interactive, 1 per view) | `--accent` | `#CC2A1E` (tomato) |
+| Accent pressed | `--accent-deep` | `#A81F16` |
+| Success | `--ok` | `#2F8F4E` (basil) |
+| Warning | `--warn` | `#B57A12` (amber) |
+| Danger (distinct from accent) | `--danger` | `#8E1B12` (brick) |
+
+### Typography
+- **Display/hero/logo:** `Anton` (condensed, heavy, caps) — logo, hero titles, recipe-ticket title. Tracking ~0.5px.
+- **UI/body:** `Inter` — 400 body (15–16px, lh 1.6), 500 labels, 600 headings; sentence case.
+- **Data/numbers:** `JetBrains Mono` tabular — grams, temps, times (the precision register). Key/active value may take `--accent`; rest are `--ink`.
+- Micro-labels: 11px, 500, uppercase, tracking +0.04em (baseline-allowed).
+
+### Surfaces / shape / motion
+- Radius: 8px controls, 12px cards (baseline default). Pills 999px only for chips.
+- Elevation: L0 canvas (no shadow), L1 cards (`0 2px 8px rgba(60,30,10,.06)` + 1px `--line`), L2 floating (`0 8px 22px rgba(60,30,10,.14)` + border). Flat fills, no gradients.
+- States (all five): hover = one tonal step on border/bg; **focus-visible = 2px `--accent` ring, 2px offset**; active = `--accent-deep`; disabled = 40% + not-allowed.
+- Motion 150/250/350ms, ease-out/in; respects `prefers-reduced-motion`.
+
+### Scoped brand devices
+- **Checkerboard** red/cream strip: app header underline + recipe-ticket header + selected ferment card foot.
+- **Tricolore** hairline (green·white·red) as a signature divider on the ticket footer ("impasto napoletano") — used once per surface, max.
+
 ## Decisions log
-- D+A+A confirmed by client. Mockups: `docs/design-directions.html`.
+- D+A+A confirmed; then refined to **Napoli** direction: light-only, Anton hero caps, cream/tomato/tricolore/checkerboard.
+- Exploration mockup: `docs/design-directions.html`. Locked-direction mockup: `docs/design-napoli.html`.

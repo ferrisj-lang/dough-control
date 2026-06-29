@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dough Control — Napoli direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7EEDD;--surface:#FFFFFF;--surface-2:#F3EAD8;
+  --ink:#2B1A12;--dim:#6B5848;--faint:#9A8772;--line:#E7D9C2;
+  --accent:#CC2A1E;--accent-deep:#A81F16;--ok:#2F8F4E;--warn:#B57A12;--danger:#8E1B12;
+  --green:#1E8A4C;
+  --radius:12px;--radius-sm:8px;
+  --shadow-1:0 2px 8px rgba(60,30,10,.06);--shadow-2:0 8px 22px rgba(60,30,10,.14);
+  --display:'Anton',sans-serif;--body:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:15px;line-height:1.6;padding-bottom:64px}
+
+/* scoped decorative devices */
+.checker{height:14px;background-image:
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%),
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%);
+  background-size:16px 16px;background-position:0 0,8px 8px;background-color:var(--bg)}
+.tricolore{display:flex;align-items:center;gap:10px;color:var(--faint);
+  font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;justify-content:center;margin-top:6px}
+.tricolore::before,.tricolore::after{content:'';height:4px;flex:1;border-radius:2px;
+  background:linear-gradient(to right,var(--green) 0 33%,#fff 33% 66%,var(--accent) 66% 100%)}
+.tricolore::after{background:linear-gradient(to right,var(--accent) 0 33%,#fff 33% 66%,var(--green) 66% 100%)}
+
+.head{background:var(--surface);border-bottom:1px solid var(--line)}
+.head .inner{max-width:480px;margin:0 auto;padding:16px 18px 12px;display:flex;align-items:baseline;gap:10px}
+.logo{font-family:var(--display);font-size:34px;letter-spacing:.5px;line-height:1;text-transform:uppercase}
+.logo .o{color:var(--accent)}
+.head .units{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--dim);
+  border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+
+.canvas{max-width:480px;margin:0 auto;padding:20px 18px}
+.kicker{font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent);margin:26px 2px 10px}
+.tag{color:var(--dim);font-size:14px;margin:2px 2px 18px}
+
+.dots{display:flex;align-items:center;margin:4px 0 20px}
+.dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:600;color:var(--faint);font-family:var(--mono);background:var(--surface)}
+.dot.on{border-color:var(--accent);color:var(--accent)}
+.dot.done{border-color:var(--ok);color:var(--ok)}
+.dline{flex:1;height:1.5px;background:var(--line)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow-1);padding:18px;margin-bottom:16px}
+.lbl{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--faint);font-weight:600;margin-bottom:12px}
+.h3{font-size:18px;font-weight:600;margin:0 0 4px}
+
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.opt{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:12px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--accent)}
+.opt.on{border-color:var(--accent);background:#FCEFEC}
+.opt .nm{font-family:var(--display);font-weight:400;font-size:18px;text-transform:uppercase;letter-spacing:.3px}
+.opt .sub{font-size:12px;color:var(--dim);margin-top:4px}
+.flag{color:var(--ok)}
+
+.slide{margin:18px 0 2px}
+.slhead{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-bottom:8px}
+.slhead .v{font-family:var(--mono);color:var(--ink);font-weight:600}
+.track{position:relative;height:5px;border-radius:3px;background:var(--surface-2)}
+.track .fill{position:absolute;left:0;top:0;bottom:0;width:46%;border-radius:3px;background:var(--accent)}
+.knob{position:absolute;left:46%;top:50%;width:18px;height:18px;border-radius:50%;background:var(--accent);
+  transform:translate(-50%,-50%);border:3px solid var(--surface);box-shadow:var(--shadow-1)}
+.tstar{position:absolute;left:62%;top:-15px;transform:translateX(-50%);color:var(--ok);font-size:12px}
+
+.fcards{display:flex;flex-direction:column;gap:10px}
+.fc{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:13px 15px;cursor:pointer;position:relative;overflow:hidden;transition:border-color .15s}
+.fc:hover{border-color:var(--accent)}
+.fc.on{border-color:var(--accent);background:#FCEFEC}
+.fc .nm{font-weight:600;font-size:14px}
+.fc .it{font-family:var(--display);font-weight:400;text-transform:uppercase;letter-spacing:.3px;font-size:15px}
+.fc .fl{font-size:13px;color:var(--dim);margin-top:3px}
+.fc .ck{height:12px;margin:11px -15px -13px;background-image:
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%),
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%);
+  background-size:12px 12px;background-position:0 0,6px 6px}
+
+.btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:14px 22px;
+  font-weight:600;font-size:15px;cursor:pointer;font-family:var(--body);width:100%;transition:background .15s}
+.btn:hover{background:var(--accent-deep)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt:focus-visible,.fc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* recipe ticket */
+.ticket{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-1);overflow:hidden;margin-bottom:16px}
+.ticket .ck-top{height:14px;background-image:
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%),
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%);
+  background-size:14px 14px;background-position:0 0,7px 7px}
+.ticket .body{padding:20px}
+.tk-h{text-align:center;margin-bottom:14px}
+.tk-h .nm{font-family:var(--display);font-size:30px;text-transform:uppercase;letter-spacing:.6px;line-height:.95}
+.tk-h .nm .o{color:var(--accent)}
+.tk-h .meta{font-size:12px;color:var(--dim);margin-top:6px}
+.trow{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.trow.big{font-size:15px;font-weight:600}
+.trow .g{font-family:var(--mono);font-weight:600;color:var(--ink)}
+.trow.big .g{color:var(--accent)}
+
+.tl{position:relative;padding-left:22px;margin-top:4px}
+.tl::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.ti{position:relative;padding:9px 0}
+.ti::before{content:'';position:absolute;left:-21px;top:13px;width:11px;height:11px;border-radius:50%;background:var(--accent);border:3px solid var(--surface)}
+.ti.bake::before{background:var(--ok)}
+.ti .t{font-family:var(--mono);color:var(--accent);font-size:12px;font-weight:600}
+.ti .nm{font-weight:600;font-size:14px;margin:1px 0}
+.ti .d{font-size:13px;color:var(--dim)}
+
+.foot{text-align:center;color:var(--faint);font-size:12px;margin:30px 0 0}
+.note{max-width:480px;margin:0 auto;padding:16px 18px 0;font-size:12px;color:var(--faint)}
+</style>
+</head>
+<body>
+  <div class="head">
+    <div class="inner">
+      <div class="logo">DOUGH <span class="o">CONTROL</span></div>
+      <span class="units">°C / g</span>
+    </div>
+    <div class="checker"></div>
+  </div>
+
+  <div class="note">Napoli direction — light only. Anton (hero caps) · Inter (UI) · JetBrains Mono (data). Toggle nothing: this is the single locked direction for sign-off.</div>
+
+  <div class="canvas">
+    <div class="tag">From a target bake time to a gram-precise Neapolitan dough.</div>
+
+    <div class="kicker">① Wizard — dough profile</div>
+    <div class="dots">
+      <span class="dot done">1</span><span class="dline"></span>
+      <span class="dot on">2</span><span class="dline"></span>
+      <span class="dot">3</span><span class="dline"></span>
+      <span class="dot">4</span><span class="dline"></span>
+      <span class="dot">5</span>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Dough profile</div>
+      <div class="row3">
+        <div class="opt"><div class="nm">Classico</div><div class="sub">6 h · 60% hyd</div></div>
+        <div class="opt on" tabindex="0"><div class="nm">Napoletano <span class="flag">★</span></div><div class="sub">24 h · 62% hyd</div></div>
+        <div class="opt"><div class="nm">Maestro</div><div class="sub">48 h · 65% hyd</div></div>
+      </div>
+      <div class="slide">
+        <div class="slhead"><span>Hydration</span><span class="v">62 %</span></div>
+        <div class="track"><span class="tstar">★</span><span class="fill"></span><span class="knob"></span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Fermentation method</div>
+      <div class="fcards">
+        <div class="fc" tabindex="0"><div class="nm"><span class="it">Diretto</span> — room temperature</div><div class="fl">Fresh, milky aromas. Best over 6–8 h.</div></div>
+        <div class="fc on" tabindex="0"><div class="nm"><span class="it">Freddo</span> <span class="flag">★</span> — bulk, then cold hold</div><div class="fl">Best of both worlds: maturity and reliability.</div><div class="ck"></div></div>
+        <div class="fc" tabindex="0"><div class="nm"><span class="it">Lento</span> — cold maturation</div><div class="fl">Slow, deep, complex, very digestible.</div></div>
+      </div>
+    </div>
+
+    <button class="btn">Next: your tools →</button>
+
+    <div class="kicker">② Output — recipe</div>
+    <div class="ticket">
+      <div class="ck-top"></div>
+      <div class="body">
+        <div class="tk-h">
+          <div class="nm">PIZZA <span class="o">NAPOLETANA</span></div>
+          <div class="meta">4 × 255 g · Ø 30 cm · 24 h · Ooni Koda 12 · bake Sat 20:00</div>
+        </div>
+        <div class="trow big"><span>Flour (Tipo 00 pizzeria)</span><span class="g">645 g</span></div>
+        <div class="trow big"><span>Water (24 °C)</span><span class="g">400 g</span></div>
+        <div class="trow"><span>Salt (2.33%)</span><span class="g">15.0 g</span></div>
+        <div class="trow"><span>Fresh yeast (0.40%)</span><span class="g">2.58 g</span></div>
+        <div class="trow" style="border:none"><span>Hydration</span><span class="g">62%</span></div>
+        <div class="tricolore">Impasto napoletano</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Your plan — backwards from Sat 20:00</div>
+      <div class="tl">
+        <div class="ti"><div class="t">Fri 20:00</div><div class="nm">Knead</div><div class="d">Water at 24 °C. Optional 20 min autolyse before salt.</div></div>
+        <div class="ti"><div class="t">Sat 06:00 · 10 h</div><div class="nm">Warm bulk</div><div class="d">At 21 °C until doubled. 1–2 folds in the first hour.</div></div>
+        <div class="ti"><div class="t">Sat 18:30</div><div class="nm">Balling (staglio)</div><div class="d">4 balls of 255 g. Tight pirlatura.</div></div>
+        <div class="ti bake"><div class="t">Sat 20:00</div><div class="nm">🔥 Bake</div><div class="d">60–90 s per pizza. Quarter-turns.</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Bake — Ooni Koda 12</div>
+      <div style="font-size:14px;color:var(--dim)">Preheat <span class="trow-g" style="font-family:var(--mono);color:var(--ink);font-weight:600">20 min</span> at full power. Launch, 60–90 s, regular quarter-turns. Stone ~430–450 °C.</div>
+    </div>
+
+    <div class="foot">Buon appetito — made with Dough Control</div>
+  </div>
+  <div class="checker" style="margin-top:30px"></div>
+</body>
+</html>
