@@ -64,10 +64,14 @@ Legibility of numeric data · personality/memorability · light+dark quality · 
 | Danger (distinct from accent) | `--danger` | `#8E1B12` (brick) |
 
 ### Typography
-- **Display/hero/logo:** `Anton` (condensed, heavy, caps) — logo, hero titles, recipe-ticket title. Tracking ~0.5px.
+- **Logo:** `Baloo 2` (rounded, extrabold, caps) — **both words tomato**, with a stacked offset-shadow (`2px 2px 0 --accent-deep`) for playful retro depth (ref: "Pizzi" sign). The one "fun" brand face.
+- **Display/hero:** `Anton` (condensed, heavy, caps) — hero/page titles + the **descriptive** recipe-ticket title (e.g. `PIZZA NAPOLETANA`).
 - **UI/body:** `Inter` — 400 body (15–16px, lh 1.6), 500 labels, 600 headings; sentence case.
 - **Data/numbers:** `JetBrains Mono` tabular — grams, temps, times (the precision register). Key/active value may take `--accent`; rest are `--ink`.
 - Micro-labels: 11px, 500, uppercase, tracking +0.04em (baseline-allowed).
+
+### Playful depth (scoped "fun")
+Restrained dimensionality on three brand touchpoints only: the **logo** (offset shadow), the **★ recommended** star (emboss: `0 1.5px 0` darker-green edge + soft shadow), and **slider knobs/tracks** (inset track groove + raised knob with inner highlight + center dot). Everything else stays flat per baseline §12.
 
 ### Surfaces / shape / motion
 - Radius: 8px controls, 12px cards (baseline default). Pills 999px only for chips.
