@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dough Control — Design Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Space+Grotesk:wght@500;600;700&family=Nunito:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============ shared tokens (overridden per direction/theme) ============ */
+:root{
+  --bg:#141110;--surface:#1e1916;--surface2:#262019;--ink:#efe7d8;--dim:#a89b89;--faint:#6e6354;
+  --accent:#ff6b2c;--gold:#e8b44a;--ok:#8fb573;--line:#383028;
+  --radius:12px;--radius-sm:8px;--chip-radius:999px;
+  --card-border:1px solid var(--line);--card-shadow:none;
+  --font-display:'Inter',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --display-spacing:0px;--display-transform:none;--label-transform:uppercase;--label-spacing:1.4px;
+}
+
+/* ---------- FORNO : warm modern artisan ---------- */
+[data-dir="forno"]{
+  --font-display:'Fraunces',serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --radius:14px;--radius-sm:10px;--chip-radius:10px;--display-transform:none;--display-spacing:.2px;
+  --label-transform:uppercase;--label-spacing:1.6px;
+}
+[data-dir="forno"][data-theme="light"]{
+  --bg:#f7f0e6;--surface:#fffaf2;--surface2:#f1e7d6;--ink:#2a2018;--dim:#7a6c59;--faint:#a2937d;
+  --accent:#c2542f;--gold:#bd8a2e;--ok:#6f8a52;--line:#e3d6c0;
+  --card-border:1px solid var(--line);--card-shadow:0 6px 22px rgba(120,80,40,.08);
+}
+[data-dir="forno"][data-theme="dark"]{
+  --bg:#1b1612;--surface:#241d18;--surface2:#2d241c;--ink:#f1e7d8;--dim:#b3a48f;--faint:#7d6e59;
+  --accent:#e0744a;--gold:#d9a94e;--ok:#93b07a;--line:#3a2f24;
+  --card-border:1px solid var(--line);--card-shadow:0 8px 26px rgba(0,0,0,.4);
+}
+
+/* ---------- TIPO : editorial instrument ---------- */
+[data-dir="tipo"]{
+  --font-display:'Space Grotesk',sans-serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --radius:5px;--radius-sm:4px;--chip-radius:4px;--display-transform:none;--display-spacing:-.4px;
+  --label-transform:uppercase;--label-spacing:2px;--card-shadow:none;
+}
+[data-dir="tipo"][data-theme="light"]{
+  --bg:#ffffff;--surface:#f7f7f4;--surface2:#efefe9;--ink:#111110;--dim:#5c5c55;--faint:#9a9a90;
+  --accent:#e2342a;--gold:#caa23a;--ok:#4f8a3f;--line:#e2e2da;--card-border:1px solid #e2e2da;
+}
+[data-dir="tipo"][data-theme="dark"]{
+  --bg:#0b0b0c;--surface:#151518;--surface2:#1d1d21;--ink:#f2f2ef;--dim:#9b9b95;--faint:#65655f;
+  --accent:#ff4533;--gold:#e0b24a;--ok:#7bbf63;--line:#2a2a2f;--card-border:1px solid #2a2a2f;
+}
+
+/* ---------- LIEVITO : soft minimal ---------- */
+[data-dir="lievito"]{
+  --font-display:'Nunito',sans-serif;--font-body:'Nunito',sans-serif;--font-mono:'JetBrains Mono',monospace;
+  --radius:20px;--radius-sm:14px;--chip-radius:999px;--display-transform:none;--display-spacing:.2px;
+  --label-transform:none;--label-spacing:.2px;
+}
+[data-dir="lievito"][data-theme="light"]{
+  --bg:#fbf7f2;--surface:#ffffff;--surface2:#f5efe7;--ink:#3a352f;--dim:#8a8076;--faint:#b3a99c;
+  --accent:#ef7b4d;--gold:#e3ad52;--ok:#8fb573;--line:#efe6da;
+  --card-border:none;--card-shadow:0 10px 30px rgba(150,110,70,.12);
+}
+[data-dir="lievito"][data-theme="dark"]{
+  --bg:#211d25;--surface:#2b2630;--surface2:#352f3c;--ink:#efeae2;--dim:#aaa1b0;--faint:#76707f;
+  --accent:#f08a5d;--gold:#eab861;--ok:#9dbe83;--line:#3a3442;
+  --card-border:none;--card-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+/* ============ layout ============ */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);
+  transition:background .25s,color .25s;padding-bottom:60px}
+.bar{position:sticky;top:0;z-index:10;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  padding:12px 16px;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line)}
+.bar b{font-family:var(--font-display);font-size:15px;letter-spacing:.3px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:transparent;border:none;color:var(--dim);padding:7px 12px;font-size:13px;
+  font-weight:600;cursor:pointer;font-family:var(--font-body)}
+.seg button.on{background:var(--accent);color:#fff}
+.spacer{flex:1}
+.note{font-size:12px;color:var(--faint);padding:14px 16px 0;max-width:520px}
+.canvas{max-width:480px;margin:0 auto;padding:18px 16px}
+.screenlbl{font-family:var(--font-mono);font-size:11px;color:var(--accent);font-weight:600;
+  text-transform:uppercase;letter-spacing:1.5px;margin:22px 4px 10px}
+
+.brand{font-family:var(--font-display);font-weight:700;font-size:30px;letter-spacing:var(--display-spacing);
+  text-transform:var(--display-transform);line-height:1}
+.brand .o{color:var(--accent)}
+.tag{color:var(--dim);font-size:13px;margin:6px 2px 16px}
+
+.dots{display:flex;align-items:center;gap:0;margin:6px 0 18px}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;
+  justify-content:center;font-size:11px;font-weight:700;color:var(--faint);font-family:var(--font-mono)}
+.dot.on{border-color:var(--accent);color:var(--accent)}
+.dot.done{border-color:var(--ok);color:var(--ok)}
+.dline{flex:1;height:2px;background:var(--line)}
+
+.card{background:var(--surface);border:var(--card-border);border-radius:var(--radius);
+  box-shadow:var(--card-shadow);padding:18px;margin-bottom:14px}
+.lbl{font-size:11px;text-transform:var(--label-transform);letter-spacing:var(--label-spacing);
+  color:var(--faint);font-weight:700;margin-bottom:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.opt{background:var(--surface2);border:1px solid var(--line);border-radius:var(--radius-sm);
+  padding:11px 12px;cursor:pointer;text-align:left}
+.opt.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.opt .nm{font-family:var(--font-display);font-weight:700;font-size:17px;text-transform:var(--display-transform)}
+.opt .sub{font-size:11px;color:var(--dim);margin-top:3px}
+.star{color:var(--gold)}
+.slide{margin:16px 0 4px}
+.slhead{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-bottom:7px}
+.slhead .v{font-family:var(--font-mono);color:var(--gold);font-weight:600}
+.track{position:relative;height:5px;border-radius:3px;background:var(--line)}
+.track::before{content:'';position:absolute;left:0;top:0;bottom:0;width:46%;border-radius:3px;background:var(--accent)}
+.knob{position:absolute;left:46%;top:50%;width:18px;height:18px;border-radius:50%;background:var(--accent);
+  transform:translate(-50%,-50%);border:3px solid var(--surface)}
+.tstar{position:absolute;left:62%;top:-16px;transform:translateX(-50%);color:var(--gold);font-size:12px}
+
+.fcards{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.fc{background:var(--surface2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;position:relative;overflow:hidden}
+.fc.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.fc .nm{font-weight:700;font-size:14px}
+.fc .it{font-family:var(--font-display);text-transform:var(--display-transform)}
+.fc .fl{font-size:12px;color:var(--dim);margin-top:3px}
+.checker{height:12px;margin:10px -14px -12px;background-image:
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%),
+  linear-gradient(45deg,var(--accent) 25%,transparent 25%,transparent 75%,var(--accent) 75%);
+  background-size:12px 12px;background-position:0 0,6px 6px;opacity:.8}
+
+.ticket{background:var(--surface);border:var(--card-border);border-radius:var(--radius);box-shadow:var(--card-shadow);padding:20px;margin-bottom:14px}
+.tk-h{text-align:center;border-bottom:2px solid var(--line);padding-bottom:10px;margin-bottom:12px}
+.tk-h .nm{font-family:var(--font-display);font-weight:700;font-size:20px;text-transform:var(--display-transform)}
+.tk-h .meta{font-size:12px;color:var(--dim);margin-top:3px}
+.trow{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.trow.big{font-size:15px;font-weight:700}
+.trow .g{font-family:var(--font-mono);font-weight:600}
+.num{font-family:var(--font-mono);color:var(--gold);font-weight:600}
+
+.tl{position:relative;padding-left:22px;margin-top:4px}
+.tl::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.ti{position:relative;padding:9px 0}
+.ti::before{content:'';position:absolute;left:-21px;top:13px;width:11px;height:11px;border-radius:50%;background:var(--accent);border:3px solid var(--surface)}
+.ti.bake::before{background:var(--gold)}
+.ti .t{font-family:var(--font-mono);color:var(--gold);font-size:12px}
+.ti .nm{font-weight:700;font-size:14px;margin:1px 0}
+.ti .d{font-size:12px;color:var(--faint)}
+
+.btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:13px 22px;
+  font-weight:700;font-size:14px;cursor:pointer;font-family:var(--font-body);width:100%}
+[data-dir="tipo"] .btn{border-radius:5px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--line);
+  border-radius:var(--chip-radius);padding:6px 12px;font-size:12px;font-weight:600;color:var(--dim)}
+.pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+</style>
+</head>
+<body data-dir="forno" data-theme="dark">
+  <div class="bar">
+    <b>Design directions</b>
+    <span class="spacer"></span>
+    <span class="seg" id="dirseg">
+      <button data-dir="forno" class="on">Forno</button>
+      <button data-dir="tipo">Tipo</button>
+      <button data-dir="lievito">Lievito</button>
+    </span>
+    <span class="seg" id="themeseg">
+      <button data-theme="light">Light</button>
+      <button data-theme="dark" class="on">Dark</button>
+    </span>
+  </div>
+
+  <div class="note" id="blurb"></div>
+
+  <div class="canvas">
+    <div class="brand">DOUGH <span class="o">CONTROL</span></div>
+    <div class="tag" id="tagline">From a target bake time to a gram-precise Neapolitan dough.</div>
+
+    <div class="screenlbl">① Wizard — Dough profile</div>
+    <div class="dots">
+      <span class="dot done">1</span><span class="dline"></span>
+      <span class="dot on">2</span><span class="dline"></span>
+      <span class="dot">3</span><span class="dline"></span>
+      <span class="dot">4</span><span class="dline"></span>
+      <span class="dot">5</span>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Dough profile</div>
+      <div class="row3">
+        <div class="opt"><div class="nm">Classico</div><div class="sub">6 h · 60% hyd</div></div>
+        <div class="opt on"><div class="nm">Napoletano <span class="star">★</span></div><div class="sub">24 h · 62% hyd</div></div>
+        <div class="opt"><div class="nm">Maestro</div><div class="sub">48 h · 65% hyd</div></div>
+      </div>
+      <div class="slide">
+        <div class="slhead"><span>Hydration</span><span class="v">62 %</span></div>
+        <div class="track"><span class="tstar">★</span><span class="knob"></span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Fermentation method</div>
+      <div class="fcards">
+        <div class="fc"><div class="nm"><span class="it">Diretto</span> — room temperature</div><div class="fl">Fresh, milky aromas. Best over 6–8 h.</div></div>
+        <div class="fc on"><div class="nm"><span class="it">Freddo</span> <span class="star">★</span> — bulk, then cold hold</div><div class="fl">Best of both worlds: maturity + reliability.</div><div class="checker"></div></div>
+        <div class="fc"><div class="nm"><span class="it">Lento</span> — cold maturation</div><div class="fl">Slow, deep, complex, very digestible.</div></div>
+      </div>
+    </div>
+
+    <button class="btn">Next: your tools →</button>
+
+    <div class="screenlbl">② Output — Recipe</div>
+    <div class="ticket">
+      <div class="tk-h">
+        <div class="nm">DOUGH CONTROL</div>
+        <div class="meta">4 × 255 g · Ø 30 cm · Napoletano · Ooni Koda 12</div>
+        <div class="meta">Bake: Sat 20:00</div>
+      </div>
+      <div class="trow big"><span>Flour (Tipo 00 pizzeria)</span><span class="g">645 g</span></div>
+      <div class="trow big"><span>Water (24 °C)</span><span class="g">400 g</span></div>
+      <div class="trow"><span>Salt (2.33 %)</span><span class="g">15.0 g</span></div>
+      <div class="trow"><span>Fresh yeast (0.40 %)</span><span class="g">2.58 g</span></div>
+      <div class="trow"><span>Hydration</span><span class="g">62 %</span></div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Your plan — backwards from Sat 20:00</div>
+      <div class="tl">
+        <div class="ti"><div class="t">Fri 20:00</div><div class="nm">Knead</div><div class="d">Water at 24 °C. Optional 20 min autolyse before salt.</div></div>
+        <div class="ti"><div class="t">Sat 06:00 · 10 h</div><div class="nm">Warm bulk</div><div class="d">At 21 °C until doubled. 1–2 folds in the first hour.</div></div>
+        <div class="ti"><div class="t">Sat 18:30</div><div class="nm">Balling (staglio)</div><div class="d">4 balls of 255 g. Tight pirlatura.</div></div>
+        <div class="ti bake"><div class="t">Sat 20:00</div><div class="nm">🔥 Bake</div><div class="d">60–90 s per pizza.</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Bake — Ooni Koda 12</div>
+      <div class="trow" style="border:none"><span style="font-size:13px;color:var(--dim)">Preheat <span class="num">20 min</span> at full power. Launch, 60–90 s, regular quarter-turns. Stone ~430–450 °C.</span></div>
+    </div>
+  </div>
+
+<script>
+const root=document.body;
+const BLURB={
+  forno:"FORNO — warm modern artisan. Cream / terracotta / charcoal, a characterful Fraunces serif over clean Inter. Premium bakery feel; evolves today's warmth.",
+  tipo:"TIPO — editorial instrument. High-contrast, single vivid tomato accent, Space Grotesk display, tabular mono numbers, hairline grid, sharp corners. Reads as a precision tool.",
+  lievito:"LIEVITO — soft minimal. Airy, rounded Nunito, muted ember + sage, large radii and gentle shadows. Friendly, approachable consumer-app feel."
+};
+function setBlurb(){document.getElementById('blurb').textContent=BLURB[root.dataset.dir];}
+document.getElementById('dirseg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  root.dataset.dir=b.dataset.dir;
+  [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));
+  setBlurb();
+});
+document.getElementById('themeseg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b)return;
+  root.dataset.theme=b.dataset.theme;
+  [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));
+});
+setBlurb();
+</script>
+</body>
+</html>

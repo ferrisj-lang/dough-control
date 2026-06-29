@@ -244,7 +244,7 @@ US/EU switch on the pre-start screen. Region-appropriate brand/product examples 
 Pre-start picker: **Amateur** ("Piece of Cake") / **Enthusiast** ("Let's Rock") / **Expert/Pizzaiolo** ("Damn I'm Good"). Tier changeable mid-session via header chips; enforcement via `eff*` derived values (matrix in §15).
 
 ### R3 — Schedule gating by available lead time — ✅ DONE
-Methods that don't fit `hoursUntilBake` (+0.5 h buffer) are grayed/non-clickable with an explanatory tooltip; auto-fallback to the longest fitting method + toast notice.
+Methods that don't fit `hoursUntilBake` are grayed/non-clickable with an explanatory tooltip; auto-fallback to the longest fitting method + toast notice. **Sprint 3 final model:** the hard gate is the **exact fermentation duration** (`methodFits = hoursUntil >= hours`) — so a 24 h 13 m window keeps the 24 h method (no silent drop to 6 h), and greying is purely derived from `hoursUntil` (adding time re-enables tiers live). The **+0.5 h prep buffer survives as an explicit advisory, not a silent gate**: `methodTight = fits && hoursUntil < hours + PREP_BUFFER` shows a gold "tight on prep" flag on borderline tiers, and the bake-date card explains the ~30 min reserve (mixing + balling + preheat). This keeps the buffer's wisdom visible without the confusing rejection.
 
 ### R4 — Flour storage as presets — ✅ DONE
 Cupboard ~21 °C ★ / cool dry place ~18 °C / cellar ~15 °C. Numeric slider Expert-only.
@@ -258,8 +258,9 @@ Sliders absent below Expert; benchmark values used silently; an info card explai
 ### R7 — Default fermentation = bulk-then-hold — ✅ DONE
 Standard for every tier. Expert gets the 3-way choice: bulk-then-hold ★ / cold maturation / ambient.
 
-### R8 — Timeline walkthrough with videos / visuals — ⏳ REMAINING
+### R8 — Timeline walkthrough with videos / visuals — ✅ DONE
 Per-step technique visuals (autolyse mix · coil fold · staglio + pirlatura · stretching · launching & turning · poke test · two-stage home bake). In production, `<video>`/embeds work; the artifact version must keep an **animated SVG/CSS fallback** (no network). Per-step optional media slot, graceful text-only fallback.
+**Implementation:** module-level `TECHNIQUES` registry (sibling of `TROUBLES`), each `{ id, name, blurb, Svg, media? }`. Timeline steps carry a `tech: [...ids]` array; a no-print "▸ Voir la technique" toggle (state `openTech`, one step open at a time) expands an animated SVG/CSS figure + FR blurb. The SVG is **always** the rendered fallback (zero network ⇒ identical in artifact & prod); the optional `media` slot renders a `<video>` only when a URL is present (none today), so prod can light up video later without touching logic. Animations honor `prefers-reduced-motion` and are `.no-print`. Mapping: autolyse→pétrissage · coilfold→pointage · pirlatura→boulage · poke→apprêt/détente · stretch+launch→cuisson (hot ovens) · stretch+twostage→cuisson (home ovens).
 
 ### R9 — Output: PDF download + "Save for later" code — ✅ DONE
 - PDF: dedicated `@media print` stylesheet (`.no-print` / `.print-area`) + `window.print()` — one-page recipe ticket + timeline + oven card.
@@ -285,27 +286,34 @@ Per-step technique visuals (autolyse mix · coil fold · staglio + pirlatura · 
 
 ★ = auto-set to the preferred value at this tier. "slider/choose" = user-editable.
 
-| Control | Amateur | Enthusiast | Expert |
+**REVISED in Sprint 3** (client spec). Two deliberate widenings vs the Sprint 2 matrix, both client-approved:
+(a) Passionate (formerly "Enthusiast") gains the **Schedule page** (room/cold split + ambient) and the **fermentation method** choice — previously Expert-only. (b) Raw chemistry (hydration / salt / FDT / ball-weight sliders) stays **Pizzaiolo-only**; Amateur stays fully automatic. The validated benchmark profile (`bulk-then-hold`, §11) is untouched — it is simply surfaced under the name **Freddo ★**.
+
+UI naming (Sprint 3): expertise tiers = Amateur / **Passionate ★** / Pizzaiolo. Dough tiers (page 2, = the engine `method`/time) = **Classico** (h6) / **Napoletano ★** (h24) / **Maestro** (h48). Fermentation methods (= engine `strategy`) = **Diretto** (ambient) / **Freddo ★** (bulk-then-hold) / **Lento** (cold-maturation).
+
+| Control | Amateur | Passionate | Pizzaiolo |
 |---|---|---|---|
-| Method (gated by time, R3) | choose | choose | choose |
-| Oven type | choose | choose | choose |
-| Pizza diameter | ★ oven sweet spot (≤30) | choose | choose |
+| Dough tier / time (gated by time, R3) | choose | choose | choose |
+| Oven type (dropdown) | choose | choose | choose |
+| Pizza diameter | ★ oven sweet spot (≤30) | slider 20–max | **slider 16–42** |
 | Crust style | ★ classic | choose | choose |
-| # pizzas | choose | choose | choose |
+| # pizzas (± stepper, default 4) | choose | choose | choose |
 | Season | choose | choose | choose |
-| Ambient temp | from season (hidden) | slider | slider |
+| Ambient temp | from season (hidden) | **± buttons (14–38 °C)** | **± buttons (14–38 °C)** |
 | Humidity | from season (hidden) | choose | choose |
 | Flour storage | ★ cupboard preset | preset | presets **+ temp slider** |
-| Mixer | ★ hand | choose | choose |
-| Fridge temp | ★ 5 °C (hidden) | ★ 5 °C | slider |
+| Mixer | **choose** (★ hand ≤6 / stand >6) | choose (★ same) | choose (★ same) |
+| Fridge temp (shown only if Freddo/Lento) | ★ 5 °C (hidden) | ★ 5 °C | slider |
 | Yeast type | ★ instant | choose | choose |
 | Flour type | ★ auto (00 pizzeria / strong 00 si biga) | choose | choose |
-| **Hydration** | hidden (benchmark) | hidden (benchmark) | **slider** |
+| **Fermentation method** (Diretto/Freddo/Lento) | ★ Freddo (locked; Classico ⇒ Diretto) | **choose** (Classico ⇒ Diretto only) | **choose** (Classico ⇒ Diretto only) |
+| **Schedule page** (room/cold split + ambient) | ✗ | **✓** | **✓** |
+| **Hydration** | hidden (benchmark) | hidden (benchmark) | **slider (★ on track)** |
+| **Ball weight** | benchmark | benchmark | **slider (★ on track)** |
 | **Salt** | hidden (benchmark) | hidden (benchmark) | **slider** |
 | **FDT** | hidden (auto) | hidden (auto) | **slider** |
-| **Fermentation strategy** | ★ bulk-then-hold (locked) | ★ bulk-then-hold (locked) | **bulk-then-hold ★ / cold maturation / ambient** |
 | Biga share / temp | benchmark | benchmark | sliders |
-| Room/cold time split | benchmark | benchmark | sliders |
+| Proof total + room/cold split | benchmark | **Schedule: ± total + coupled sliders** | **Schedule: ± total + coupled sliders** |
 
 ---
 
@@ -328,18 +336,35 @@ Per-step technique visuals (autolyse mix · coil fold · staglio + pirlatura · 
 4. ✅ R3.
 5. ✅ R1 (+ unit system requirement).
 6. ✅ R9.
-7. ⏳ R8 (visuals) — last remaining item.
+7. ✅ R8 (technique visuals on the timeline).
 8. ✅ D1 resolved (keep accurate ratios) · D2 sanity-checked, full validation pending reference recipes.
 
 ---
 
 ## 18. Sprint 2 log
 
-- **Scope delivered:** R1 (region + full unit system), R2, R3, R4, R5, R6, R7, R9. Engine untouched and re-validated (4.01 g fresh on the 24 H benchmark — PASS).
+- **Scope delivered:** R1 (region + full unit system), R2, R3, R4, R5, R6, R7, R8, R9 — **Sprint 2 complete**. Engine untouched and re-validated (4.01 g fresh on the 24 H benchmark — PASS).
 - **New requirement folded in:** region drives the **unit system** (US: °F + oz alongside grams), including hardcoded temperatures in oven tip strings via `locTemps()`. Friction deltas are exempt by design.
 - **Decisions:** D1 → keep accurate yeast ratios. D3 → dropped.
 - **Productionization:** repo scaffolded (Vite + React), `window.storage` shim, CI validation gate, GitHub Pages auto-deploy. The component file is byte-identical between artifact and prod.
-- **Remaining:** R8 (technique visuals on the timeline). Then **Sprint 3: design overhaul** — a design brief will be prepared in `docs/` with full client-discovery questions.
+- **Remaining:** none — Sprint 2 closed. Next up **Sprint 3: design overhaul** — a design brief will be prepared in `docs/` with full client-discovery questions.
+
+---
+
+## 19. Sprint 3 log — wizard redesign (in progress)
+
+**Goal:** client-driven UX overhaul of the wizard. Engine §5 **untouched** — `npm run validate` still PASS (4.01 g fresh on the 24 H benchmark). All new concepts map onto existing engine inputs.
+
+- **Bilingual FR/EN** (`lang` state + `tr()`/`L()` helpers, header toggle). Data strings carry `{fr,en}`; `L()` resolves, `tr(fr,en)` for inline copy. `fmtClock(d, lang)` switches locale.
+- **6 pages** (Schedule shown only for Passionate/Pizzaiolo, so Amateur sees 5): 1 Profile (region/units · bake **date** + **time presets** 12/13/18/19/20 + custom · # pizzas ± stepper · level) · 2 Dough (Classico/Napoletano★/Maestro tiers = engine method, ★ marker on hydration/ball sliders · Diretto/Freddo★/Lento method cards with timing + flavor + **checkerboard strip** on select) · 3 Tools (oven **dropdown** · diameter slider 16–42 Pizzaiolo / 20–max Passionate · kitchen season/humidity/**ambient ± buttons** · flour storage + temp · knead pros/cons + water-temp output · fridge temp if Freddo/Lento) · 4 Ingredients (yeast/flour/tomatoes + Pizzaiolo chemistry) · 5 Schedule (interdependent ambient/room/cold preserving the method total + live ingredient quick-total) · 6 Recipe (unchanged + **quick-fix / forever-fix** in the help section).
+- **Global header** on every wizard page: language · units · # pizzas stepper · level switch · per-page Back. Tool availability re-adapts live to the level.
+- **Decisions:** (1) dough tier = fermentation time (1 control). (2) Diretto=ambient, **Freddo★=bulk-then-hold** (validated benchmark renamed), Lento=cold-maturation. (3) §15 widened for Passionate (see §15). (4) Mixer ★ dynamic: hand ≤6 balls, KitchenAid/stand >6.
+- **State added:** `lang`, `ballManual` (Pizzaiolo ball override). Save format bumped to `{v:3}`; loader still accepts `v:2` (missing fields default).
+- **Verification:** `npm run validate` PASS · `npm run build` green · SSR smoke render of 3 tiers × 6 pages (18 scenarios) all clean.
+- **Review round 1 (client feedback):** default language → **English**. Start screen: added a quick intro + feature chips, **removed the level cards** (now only on the Profile page), and reframed the code box with an explanation ("Resume a recipe"). Profile: **R3 buffer removed** (auto-switch bug — 24 h 13 m no longer drops to 6 h; tiers re-enable when time is added back) + **Back button returns to the main screen** from step 1. Tools: **kneading is now choosable at Amateur** (`effMixer = mixer`, ★ stays dynamic) and **room temperature goes up to 38 °C**. Global: the **language chip now shows the language you'll switch TO** (🌐 EN when in FR, and vice-versa). Verified: validate PASS · build green · gating unit-check 7/7 · SSR smoke 2 langs × 3 tiers × 6 pages (36) clean.
+- **Review round 2 (client feedback):** (1) **Prep buffer restored as an advisory** — hard gate stays at the exact fermentation duration, but the +0.5 h reserve is now surfaced (gold "tight on prep" flag on borderline tiers + an explanatory note on the bake-date card) instead of silently dropping the method. (2) **Schedule proof-time model fixed** — added a **± Total proof time** stepper (state `proofTotal`, default = the method's room+cold; clamped to the available window via `proofMax`), and the room/cold sliders are now **coupled to always sum to the total** (`effRoom`+`effCold` ≡ `effProof`; Diretto = all room, no cold slider; biga handled automatically). Save bumped fields (`proofTotal`) under the same `{v:3}`. Verified: validate PASS · build green · gate/buffer unit-check 5/5 · proof-sum invariant 1219/1219 exact · SSR smoke 36 variants (method+strategy varied) clean.
+- **Review round 3 (client feedback):** (1) **Classico (6 h) is restricted to Diretto** — 6 h is too short for meaningful fridge work, so Freddo/Lento are disabled on the method cards (with a tooltip + note) and `effStrategy` is forced to `ambient` for `h6` at every tier (`allowedStrategies` helper; `usesFridge` now derives from `effStrategy`). Switching Classico→Napoletano/Maestro restores the user's prior method choice (state is preserved, only the *effective* value is forced). (2) **The time-availability toast now clears** as soon as the current method fits again (`if (methodFits(method)) { setNotice(null); return; }`), so pushing the bake time back removes the warning. Verified: validate PASS · build green · classico/warning unit-check 6/6 · SSR smoke 36 variants (incl. h6 carrying a stale coldmat strategy) clean.
+- **Open / next:** Wizard UX work is signed off by the client. **Next: UI design sprint** (visual redesign within the locked design system) — and the R8 technique visuals polish folds into it.
 
 ---
 
