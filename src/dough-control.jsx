@@ -739,84 +739,95 @@ export default function DoughControl() {
 
   /* ════════════════════════════ STYLES ═══════════════════════════ */
   const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Albert+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
-  :root{--bg:#141110;--surface:#1E1916;--surface2:#262019;--line:#383028;--flour:#EFE7D8;--dim:#A89B89;--faint:#6E6354;--ember:#FF6B2C;--gold:#E8B44A;--basil:#8FB573;--warn:#E0563C}
-  .dc{background:var(--bg);min-height:100vh;color:var(--flour);font-family:'Albert Sans',sans-serif;padding:20px 16px 60px}
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+  /* Napoli token system (light only; token-based so a dark map could be added later) */
+  :root{--bg:#F7EEDD;--surface:#FFFFFF;--surface2:#F3EAD8;--line:#E7D9C2;--flour:#2B1A12;--dim:#6B5848;--faint:#9A8772;--ember:#CC2A1E;--ember-deep:#A81F16;--gold:#CC2A1E;--basil:#1F7A3D;--green:#1E8A4C;--warn:#A56A12;--danger:#8E1B12}
+  .dc{background:var(--bg);min-height:100vh;color:var(--flour);font-family:'Inter',sans-serif;padding:20px 16px 60px}
   .dc *{box-sizing:border-box}
   .wrap{max-width:760px;margin:0 auto}
-  .display{font-family:'Big Shoulders Display',sans-serif;font-weight:800;letter-spacing:.5px}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.5px}
   .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
-  .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--faint);font-weight:700;margin-bottom:8px}
-  .chip{background:var(--surface2);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 2px 8px rgba(60,30,10,.05)}
+  .lbl{font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--faint);font-weight:600;margin-bottom:8px}
+  .chip{background:var(--surface);border:1px solid var(--line);color:var(--dim);border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
   .chip:hover{border-color:var(--ember);color:var(--flour)}
-  .chip.on{background:var(--ember);border-color:var(--ember);color:#1a0d05}
-  .chip.off{opacity:.35;cursor:not-allowed;text-decoration:line-through}
+  .chip.on{background:var(--ember);border-color:var(--ember);color:#fff}
+  .chip.off{opacity:.45;cursor:not-allowed;text-decoration:line-through}
   .chip.off:hover{border-color:var(--line);color:var(--dim)}
   .chip.sm{padding:5px 10px;font-size:12px}
-  .star{color:var(--gold);margin-left:5px;cursor:help}
-  .chip.on .star{color:#1a0d05}
-  .opt{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .15s;text-align:left;width:100%}
+  .star{color:var(--basil);margin-left:5px;cursor:help}
+  .chip.on .star{color:#fff}
+  .opt{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s;text-align:left;width:100%}
   .opt:hover{border-color:var(--ember)}
-  .opt.on{border-color:var(--ember);box-shadow:0 0 0 1px var(--ember)}
-  .opt.off{opacity:.35;cursor:not-allowed}
+  .opt.on{border-color:var(--ember);box-shadow:0 0 0 1px var(--ember);background:#FCEFEC}
+  .opt.off{opacity:.45;cursor:not-allowed}
   .opt.off:hover{border-color:var(--line)}
-  .optName{font-weight:700;font-size:14px}
+  .optName{font-weight:600;font-size:14px}
   .optSub{font-size:12px;color:var(--dim);margin-top:2px}
-  .tip{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.45}
-  .why{font-size:12px;color:var(--gold);margin-top:6px;line-height:1.4}
-  input[type=range].dcr{-webkit-appearance:none;width:100%;height:4px;background:var(--line);border-radius:2px;outline:none}
-  input[type=range].dcr::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--ember);cursor:pointer;border:3px solid var(--bg)}
-  input[type=range].dcr::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--ember);cursor:pointer;border:3px solid var(--bg)}
+  .tip{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.5}
+  .why{font-size:12px;color:var(--ember);margin-top:6px;line-height:1.4}
+  input[type=range].dcr{-webkit-appearance:none;width:100%;height:6px;background:var(--surface2);border-radius:4px;outline:none;box-shadow:inset 0 1px 2px rgba(60,30,10,.14)}
+  input[type=range].dcr::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--ember);cursor:pointer;border:3px solid var(--surface);box-shadow:0 2px 5px rgba(60,30,10,.3)}
+  input[type=range].dcr::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--ember);cursor:pointer;border:3px solid var(--surface);box-shadow:0 2px 5px rgba(60,30,10,.3)}
   .val{color:var(--gold);font-weight:600}
-  .btn{background:var(--ember);color:#1a0d05;border:none;border-radius:10px;padding:12px 22px;font-weight:700;font-size:14px;cursor:pointer;font-family:'Albert Sans',sans-serif}
-  .btn:hover{filter:brightness(1.08)}
+  .btn{background:var(--ember);color:#fff;border:none;border-radius:8px;padding:12px 22px;font-weight:600;font-size:14px;cursor:pointer;font-family:'Inter',sans-serif;transition:background .15s}
+  .btn:hover{background:var(--ember-deep)}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--dim)}
-  .btn.ghost:hover{border-color:var(--ember);color:var(--flour)}
+  .btn.ghost:hover{border-color:var(--ember);color:var(--ember)}
   .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn:focus-visible,.chip:focus-visible,.opt:focus-visible,.sel:focus-visible,.stepbtn:focus-visible,.techbtn:focus-visible,input.txt:focus-visible,.sdot:focus-visible{outline:2px solid var(--ember);outline-offset:2px}
   .stepper{display:flex;align-items:center;gap:0;margin:18px 0 22px}
   .sdot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--faint);cursor:pointer;flex-shrink:0;background:var(--surface)}
   .sdot.on{border-color:var(--ember);color:var(--ember)}
   .sdot.done{border-color:var(--basil);color:var(--basil)}
   .sdot.off{opacity:.4;cursor:not-allowed}
   .sline{flex:1;height:2px;background:var(--line);min-width:6px}
-  .ticket{background:#F6EFE2;color:#241A12;border-radius:8px;padding:22px;font-family:'JetBrains Mono',monospace;box-shadow:0 8px 30px rgba(0,0,0,.45);position:relative}
-  .ticket::before,.ticket::after{content:'';position:absolute;left:0;right:0;height:8px;background:radial-gradient(circle at 6px -2px, transparent 6px, #F6EFE2 6px);background-size:14px 8px}
-  .ticket::before{top:-7px}
-  .ticket::after{bottom:-7px;transform:scaleY(-1)}
-  .trow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #C9BBA4;font-size:14px}
+  .ticket{background:var(--surface);color:var(--flour);border:1px solid var(--line);border-radius:12px;padding:24px 22px 22px;font-family:'JetBrains Mono',monospace;box-shadow:0 2px 8px rgba(60,30,10,.06);position:relative;overflow:hidden}
+  .ticket::before{content:'';position:absolute;top:0;left:0;right:0;height:12px;background-image:linear-gradient(45deg,var(--ember) 25%,transparent 25%,transparent 75%,var(--ember) 75%),linear-gradient(45deg,var(--ember) 25%,transparent 25%,transparent 75%,var(--ember) 75%);background-size:12px 12px;background-position:0 0,6px 6px}
+  .trow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line);font-size:14px}
   .trow.big{font-size:16px;font-weight:600}
   .tl{position:relative;padding-left:26px}
   .tl::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--line)}
   .tli{position:relative;padding:10px 0}
-  .tli::before{content:'';position:absolute;left:-24px;top:15px;width:12px;height:12px;border-radius:50%;background:var(--ember);border:3px solid var(--bg)}
-  .tli.bake::before{background:var(--gold)}
-  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--gold);color:var(--flour);padding:12px 20px;border-radius:10px;font-size:13px;z-index:50;max-width:90%;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+  .tli::before{content:'';position:absolute;left:-24px;top:15px;width:12px;height:12px;border-radius:50%;background:var(--ember);border:3px solid var(--surface)}
+  .tli.bake::before{background:var(--basil)}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--ember);color:var(--flour);padding:12px 20px;border-radius:10px;font-size:13px;z-index:50;max-width:90%;box-shadow:0 6px 24px rgba(60,30,10,.18)}
   .pillrow{display:flex;flex-wrap:wrap;gap:8px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
   @media(max-width:560px){.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
-  .codebox{background:var(--surface2);border:1px dashed var(--gold);border-radius:10px;padding:14px;text-align:center}
-  .codebig{font-size:28px;letter-spacing:6px;color:var(--gold);font-weight:600}
-  input.txt{background:var(--surface2);border:1px solid var(--line);border-radius:8px;color:var(--flour);padding:10px 12px;font-size:14px;font-family:'JetBrains Mono',monospace;width:100%}
+  .codebox{background:var(--surface2);border:1px dashed var(--ember);border-radius:10px;padding:14px;text-align:center}
+  .codebig{font-size:28px;letter-spacing:6px;color:var(--ember);font-weight:600}
+  input.txt{background:var(--surface);border:1px solid var(--line);border-radius:8px;color:var(--flour);padding:10px 12px;font-size:14px;font-family:'JetBrains Mono',monospace;width:100%}
   input.txt:focus{outline:none;border-color:var(--ember)}
-  .sel{background:var(--surface2);border:1px solid var(--line);border-radius:8px;color:var(--flour);padding:11px 12px;font-size:14px;font-family:'Albert Sans',sans-serif;width:100%;cursor:pointer}
+  .sel{background:var(--surface);border:1px solid var(--line);border-radius:8px;color:var(--flour);padding:11px 12px;font-size:14px;font-family:'Inter',sans-serif;width:100%;cursor:pointer}
   .sel:focus{outline:none;border-color:var(--ember)}
-  .stepbox{display:inline-flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface2)}
-  .stepbtn{background:var(--surface2);border:none;color:var(--ember);font-size:20px;font-weight:700;width:42px;height:42px;cursor:pointer;line-height:1}
-  .stepbtn:hover{background:var(--surface);color:var(--flour)}
+  .stepbox{display:inline-flex;align-items:center;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .stepbtn{background:var(--surface);border:none;color:var(--ember);font-size:20px;font-weight:700;width:42px;height:42px;cursor:pointer;line-height:1}
+  .stepbtn:hover{background:var(--surface2);color:var(--ember-deep)}
   .stepbtn:disabled{opacity:.3;cursor:not-allowed}
   .stepval{min-width:62px;text-align:center;font-size:17px;font-weight:700;color:var(--flour);font-family:'JetBrains Mono',monospace}
   .htop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .hgrp{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .trackwrap{position:relative;padding-top:4px}
-  .trackstar{position:absolute;top:-2px;transform:translateX(-50%);color:var(--gold);font-size:13px;pointer-events:none}
-  .checkerstrip{height:14px;border-radius:0 0 11px 11px;margin:10px -14px -12px;background-image:linear-gradient(45deg,var(--ember) 25%,transparent 25%,transparent 75%,var(--ember) 75%),linear-gradient(45deg,var(--ember) 25%,transparent 25%,transparent 75%,var(--ember) 75%);background-size:14px 14px;background-position:0 0,7px 7px;opacity:.8}
+  .trackstar{position:absolute;top:-2px;transform:translateX(-50%);color:var(--basil);font-size:13px;pointer-events:none}
+  .checkerstrip{height:14px;border-radius:0 0 7px 7px;margin:10px -14px -12px;background-image:linear-gradient(45deg,var(--ember) 25%,transparent 25%,transparent 75%,var(--ember) 75%),linear-gradient(45deg,var(--ember) 25%,transparent 25%,transparent 75%,var(--ember) 75%);background-size:14px 14px;background-position:0 0,7px 7px}
+  /* brand devices (scoped decoration) */
+  .checker{height:14px;background-image:linear-gradient(45deg,var(--ember) 25%,transparent 25%,transparent 75%,var(--ember) 75%),linear-gradient(45deg,var(--ember) 25%,transparent 25%,transparent 75%,var(--ember) 75%);background-size:16px 16px;background-position:0 0,8px 8px;background-color:var(--bg)}
+  .emblem{display:inline-block;color:var(--ember);line-height:1;text-align:center}
+  .eline{display:flex;align-items:center;justify-content:center;gap:13px;margin-bottom:1px}
+  .estd{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:1px;text-transform:uppercase}
+  .esmall{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:.5px;text-transform:uppercase}
+  .ebig{font-family:'Anton',sans-serif;font-size:48px;letter-spacing:.5px;text-transform:uppercase;line-height:.82}
+  .etag{font-family:'Inter',sans-serif;font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--ember);margin-top:9px}
+  .wordmark{font-family:'Anton',sans-serif;font-size:23px;letter-spacing:.5px;text-transform:uppercase;color:var(--ember);line-height:1}
+  .tricolore{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;justify-content:center;margin-top:10px}
+  .tricolore::before,.tricolore::after{content:'';height:4px;flex:1;border-radius:2px;background:linear-gradient(to right,var(--green) 0 33%,#fff 33% 66%,var(--ember) 66% 100%)}
   .qbox{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:8px;padding:10px 12px;margin-bottom:10px}
   .qfix{font-size:12px;color:var(--basil);margin-top:4px}.qfix b{color:var(--basil)}
   .ffix{font-size:12px;color:var(--gold);margin-top:3px}.ffix b{color:var(--gold)}
-  .techbtn{background:none;border:none;color:var(--gold);font-family:'Albert Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;padding:2px 0}
-  .techbtn:hover{color:var(--ember)}
+  .techbtn{background:none;border:none;color:var(--ember);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;padding:2px 0}
+  .techbtn:hover{color:var(--ember-deep)}
   .techfig{display:flex;gap:12px;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
   .techmedia{flex:0 0 auto;width:132px;height:112px;display:flex;align-items:center;justify-content:center}
   .techvid{width:132px;height:112px;border-radius:8px;object-fit:cover}
@@ -884,9 +895,7 @@ export default function DoughControl() {
   const WizHeader = () => (
     <>
       <div className="no-print htop" style={{ marginBottom: 10 }}>
-        <div className="display" style={{ fontSize: 24 }}>
-          DOUGH <span style={{ color: "var(--ember)" }}>CONTROL</span>
-        </div>
+        <div className="wordmark">Dough Control</div>
         <div style={{ flex: 1 }} />
         <div className="hgrp">
           <button className="chip sm" onClick={() => setLang(lang === "fr" ? "en" : "fr")} title={tr("Langue", "Language")}>
@@ -949,13 +958,18 @@ export default function DoughControl() {
       <div className="dc">
         <style>{css}</style>
         <div className="wrap" style={{ maxWidth: 640, paddingTop: 40 }}>
-          <div className="htop" style={{ marginBottom: 8 }}>
-            <div className="display" style={{ fontSize: 44, lineHeight: 1 }}>
-              DOUGH <span style={{ color: "var(--ember)" }}>CONTROL</span>
-            </div>
+          <div className="htop" style={{ marginBottom: 14 }}>
             <div style={{ flex: 1 }} />
-            <button className="chip sm" onClick={() => setLang(lang === "fr" ? "en" : "fr")}>🌐 {lang === "fr" ? "EN" : "FR"}</button>
+            <div className="emblem">
+              <div className="eline"><span className="estd">Estd.</span><span className="esmall">Dough</span><span className="estd">2026</span></div>
+              <div className="ebig">Control</div>
+              <div className="etag">{tr("Pâte napolitaine au gramme près", "Gram-precise Neapolitan dough")}</div>
+            </div>
+            <div style={{ flex: 1, textAlign: "right" }}>
+              <button className="chip sm" onClick={() => setLang(lang === "fr" ? "en" : "fr")}>🌐 {lang === "fr" ? "EN" : "FR"}</button>
+            </div>
           </div>
+          <div className="checker" style={{ margin: "0 -16px 18px" }} />
           <div style={{ color: "var(--dim)", marginTop: 8, marginBottom: 18, lineHeight: 1.5 }}>
             {tr(
               "Dough Control transforme une heure de cuisson en une recette napolitaine au gramme près. Dites-lui quand vous voulez manger, votre matériel et votre cuisine — il dimensionne la pâte, calcule la dose de levure et construit votre planning, étape par étape.",
@@ -1004,7 +1018,7 @@ export default function DoughControl() {
             {storageMsg && <div className="tip" style={{ marginTop: 8, color: "var(--gold)" }}>{storageMsg}</div>}
           </div>
 
-          <button className="btn" onClick={() => { setStep(0); setStarted(true); }}>{tr("Commencer une recette", "Start a recipe")} →</button>}
+          <button className="btn" onClick={() => { setStep(0); setStarted(true); }}>{tr("Commencer une recette", "Start a recipe")} →</button>
         </div>
       </div>
     );
@@ -1450,10 +1464,10 @@ export default function DoughControl() {
         {stepKey === "recipe" && (
           <div className="print-area">
             <div className="ticket" style={{ marginBottom: 20 }}>
-              <div style={{ textAlign: "center", borderBottom: "2px solid #241A12", paddingBottom: 10, marginBottom: 12 }}>
-                <div className="display" style={{ fontSize: 22, fontFamily: "'Big Shoulders Display',sans-serif" }}>DOUGH CONTROL</div>
-                <div style={{ fontSize: 12 }}>{pizzas} × {calc.ball} g · Ø {effDia} cm · {doughTier.name} · {L(O.name)}</div>
-                <div style={{ fontSize: 12 }}>{tr("Cuisson", "Bake")} : {fmtClock(bakeAt, lang)}</div>
+              <div style={{ textAlign: "center", borderBottom: "1px dashed var(--line)", paddingBottom: 12, marginBottom: 12 }}>
+                <div className="display" style={{ fontSize: 30, lineHeight: .95, color: "var(--ember)", textTransform: "uppercase", letterSpacing: ".5px" }}>Pizza Napoletana</div>
+                <div style={{ fontSize: 12, color: "var(--dim)", marginTop: 6 }}>{pizzas} × {calc.ball} g · Ø {effDia} cm · {doughTier.name} · {L(O.name)}</div>
+                <div style={{ fontSize: 12, color: "var(--dim)" }}>{tr("Cuisson", "Bake")} : {fmtClock(bakeAt, lang)}</div>
               </div>
               <div className="trow big"><span>{tr("Farine", "Flour")} ({L(FLOURS[effFlour].name)})</span><span>{gramsOut(calc.flourG)}</span></div>
               <div className="trow big"><span>{tr("Eau", "Water")} ({fmtTemp(Math.round(calc.waterTemp), region)})</span><span>{gramsOut(calc.waterG)}</span></div>
@@ -1472,10 +1486,11 @@ export default function DoughControl() {
                 </>
               )}
               {yeastIsLow && (
-                <div style={{ fontSize: 11, marginTop: 10, color: "#7a5a2a" }}>
+                <div style={{ fontSize: 11, marginTop: 10, color: "var(--warn)" }}>
                   ⚖ {tr("Dose très faible : utilisez une balance 0,01 g, ou diluez 1 g dans 100 g d'eau et pesez l'eau de levure ×100.", "Very low dose: use a 0.01 g scale, or dissolve 1 g in 100 g water and weigh the yeast-water ×100.")}
                 </div>
               )}
+              <div className="tricolore">{tr("Impasto napoletano", "Impasto napoletano")}</div>
             </div>
 
             {/* Timeline */}

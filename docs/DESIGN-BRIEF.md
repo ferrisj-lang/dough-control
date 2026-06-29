@@ -71,7 +71,7 @@ Legibility of numeric data · personality/memorability · light+dark quality · 
 - Micro-labels: 11px, 500, uppercase, tracking +0.04em (baseline-allowed).
 
 ### Playful depth (scoped "fun")
-Restrained dimensionality on three brand touchpoints only: the **logo** (offset shadow), the **★ recommended** star (emboss: `0 1.5px 0` darker-green edge + soft shadow), and **slider knobs/tracks** (inset track groove + raised knob with inner highlight + center dot). Everything else stays flat per baseline §12.
+Restrained dimensionality on **slider knobs/tracks only** (inset track groove + raised knob with inner highlight + center dot). Logo and ★ stars are **flat**. Everything else stays flat per baseline §12.
 
 ### Surfaces / shape / motion
 - Radius: 8px controls, 12px cards (baseline default). Pills 999px only for chips.
@@ -86,3 +86,5 @@ Restrained dimensionality on three brand touchpoints only: the **logo** (offset 
 ## Decisions log
 - D+A+A confirmed; then refined to **Napoli** direction: light-only, Anton hero caps, cream/tomato/tricolore/checkerboard.
 - Exploration mockup: `docs/design-directions.html`. Locked-direction mockup: `docs/design-napoli.html`.
+- Logo year → 2026. Stars set **flat** (no dropshadow); slider depth retained.
+- **Implemented into `src/dough-control.jsx`** (light-only Napoli tokens, Anton/Inter/JetBrains Mono, emblem start-screen logo + compact wizard wordmark, white recipe ticket with checker top + tricolore footer, descriptive `PIZZA NAPOLETANA` ticket title, focus-visible rings). Token names unchanged (values flipped), so all inline refs cascaded; R8 SVGs inherit the new palette. Engine/wizard logic untouched. Verified: validate PASS · build green · SSR smoke 38 variants (start screen + tiers × pages × methods, both langs) clean.
