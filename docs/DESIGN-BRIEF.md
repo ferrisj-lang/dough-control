@@ -64,7 +64,7 @@ Legibility of numeric data · personality/memorability · light+dark quality · 
 | Danger (distinct from accent) | `--danger` | `#8E1B12` (brick) |
 
 ### Typography
-- **Logo:** emblem lockup in `Anton` (condensed heavy display), **both words tomato** — `Estd. · Dough · 2024` flanking row over a large `Control`, with a tracked-caps tagline beneath (ref: "La Pizzeteria" sign). Vintage-pizzeria badge; flat (the dimensional "fun" lives on stars/sliders, not the mark). Compact one-line `Dough Control` variant for the in-app wizard header.
+- **Logo:** emblem lockup in `Anton` (condensed heavy display), **both words tomato** — `Estd. · Dough · 2026` flanking row over a large `Control`, with a tracked-caps tagline beneath (ref: "La Pizzeteria" sign). Vintage-pizzeria badge; flat (the dimensional "fun" lives on stars/sliders, not the mark). Compact one-line `Dough Control` variant for the in-app wizard header.
 - **Display/hero:** `Anton` (condensed, heavy, caps) — hero/page titles + the **descriptive** recipe-ticket title (e.g. `PIZZA NAPOLETANA`).
 - **UI/body:** `Inter` — 400 body (15–16px, lh 1.6), 500 labels, 600 headings; sentence case.
 - **Data/numbers:** `JetBrains Mono` tabular — grams, temps, times (the precision register). Key/active value may take `--accent`; rest are `--ink`.
