@@ -1,0 +1,44 @@
+/* ════════════════════════════════════════════════════════════════
+   DOUGH CONTROL — DESIGN TOKENS
+   ────────────────────────────────────────────────────────────────
+   Système de tokens "Napoli" (bible §4). Extrait VERBATIM de la
+   chaîne `css` de src/dough-control.jsx pour que la librairie soit
+   visuellement identique à l'app en production.
+
+   ⚠ Source de vérité : src/dough-control.jsx reste le composant
+   autonome de prod (contrat rule #2 : zéro diff artifact ⇄ prod).
+   Cette librairie est un EXPORT parallèle du design system — elle ne
+   doit jamais diverger des valeurs ci-dessous. Si un token change
+   dans l'app, le répercuter ici (et inversement, seulement après
+   validation contre la bible §4).
+   ════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+/* Napoli token system (light only; token-based so a dark map could be added later) */
+:root {
+  --bg: #F7EEDD;
+  --surface: #FFFFFF;
+  --surface2: #F3EAD8;
+  --line: #E7D9C2;
+  --flour: #2B1A12;
+  --dim: #6B5848;
+  --faint: #9A8772;
+  --ember: #CC2A1E;
+  --ember-deep: #A81F16;
+  --gold: #CC2A1E;
+  --basil: #1F7A3D;
+  --green: #1E8A4C;
+  --warn: #A56A12;
+  --danger: #8E1B12;
+}
+
+/* Type primitives */
+.display { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: .5px; }
+.mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+
+/* App shell helpers (used by the wizard root; harmless as design-system utilities) */
+.dc { background: var(--bg); min-height: 100vh; color: var(--flour); font-family: 'Inter', sans-serif; padding: 20px 16px 60px; }
+.dc * { box-sizing: border-box; }
+.wrap { max-width: 760px; margin: 0 auto; }
+.lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--faint); font-weight: 600; margin-bottom: 8px; }
