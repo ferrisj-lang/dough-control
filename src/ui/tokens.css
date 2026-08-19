@@ -13,7 +13,11 @@
    validation contre la bible §4).
    ════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+/* Brand fonts — SELF-HOSTED (deliberate divergence from the app, which
+   @imports the same three families from the Google Fonts CDN). A remote
+   @import silently fails wherever the CDN is unreachable, and the whole
+   identity collapses to a fallback sans. Same typefaces, local delivery. */
+@import url('./fonts/fonts.css');
 
 /* Napoli token system (light only; token-based so a dark map could be added later) */
 :root {
@@ -32,6 +36,14 @@
   --warn: #A56A12;
   --danger: #8E1B12;
 }
+
+/* Base — DELIBERATE ADDITION (not in the app's css string).
+   In the app every primitive lives inside the `.dc` shell, which sets the
+   body font. Used standalone, a component rendered outside `.dc` would fall
+   back to the browser's serif default. This rule gives the library the same
+   typography without requiring the wrapper. No effect on prod:
+   src/dough-control.jsx does not import this file. */
+body { font-family: 'Inter', sans-serif; color: var(--flour); }
 
 /* Type primitives */
 .display { font-family: 'Anton', sans-serif; font-weight: 400; letter-spacing: .5px; }

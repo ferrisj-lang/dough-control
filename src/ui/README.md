@@ -29,6 +29,23 @@ composant : à l'écran, les deux sont identiques. C'est le même compromis
 documenté que `storage-shim.js` — on ne touche jamais au composant, on
 recrée l'API à côté.
 
+### Divergences volontaires (documentées)
+
+La librairie n'est pas un copier-coller strict : deux écarts assumés, aucun
+n'affecte la prod (le composant n'importe pas ces fichiers).
+
+1. **`body { font-family: 'Inter'; color: var(--flour) }`** dans `tokens.css`.
+   Dans l'app, chaque primitive vit dans la coque `.dc` qui pose la police ;
+   utilisée seule, une primitive hors `.dc` retombait sur le serif par défaut
+   du navigateur.
+2. **Polices auto-hébergées** (`fonts/`), là où l'app fait un `@import` vers le
+   CDN Google Fonts. Un `@import` distant échoue silencieusement dès que le CDN
+   est injoignable — et toute l'identité (Anton en tête) s'effondre sur un sans
+   générique. Mêmes fontes, livraison locale. Sous-ensembles latin + latin-ext.
+
+Les **styles d'impression** (`@media print` et la classe `.no-print`) ne sont
+**pas** repris : ils appartiennent à l'app.
+
 ### Règle de synchronisation
 
 Si un token ou une classe change dans `src/dough-control.jsx` **après
