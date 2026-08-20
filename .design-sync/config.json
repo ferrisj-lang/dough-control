@@ -7,7 +7,9 @@
   "readmeHeader": ".design-sync/conventions.md",
   "cssEntry": "src/ui/components.css",
   "tokensGlob": "src/ui/tokens.css",
-  "extraFonts": ["src/ui/fonts/fonts.css"],
+  "extraFonts": [
+    "src/ui/fonts/fonts.css"
+  ],
   "componentSrcMap": {
     "Button": "src/ui/Button.jsx",
     "Chip": "src/ui/Chip.jsx",
@@ -24,6 +26,7 @@
     "Wordmark": "src/ui/Brand.jsx",
     "Tricolore": "src/ui/Brand.jsx",
     "Checker": "src/ui/Brand.jsx",
+    "Pizzaiolo": "src/ui/Brand.jsx",
     "CodeBox": "src/ui/CodeBox.jsx",
     "Toast": "src/ui/Toast.jsx",
     "Callout": "src/ui/Callout.jsx",
@@ -48,6 +51,7 @@
     "CodeBox": "label?: React.ReactNode;\n  /** The recipe code, rendered large and letter-spaced. */\n  code?: React.ReactNode;\n  className?: string;\n  children?: React.ReactNode;",
     "Toast": "onClick?: React.MouseEventHandler;\n  className?: string;\n  children?: React.ReactNode;",
     "Callout": "/** The problem, in warn colour. */\n  title?: React.ReactNode;\n  /** Basil 'quick fix' advice line. */\n  quick?: React.ReactNode;\n  /** Gold 'forever fix' advice line. */\n  forever?: React.ReactNode;\n  quickLabel?: string;\n  foreverLabel?: string;\n  className?: string;\n  children?: React.ReactNode;",
-    "TechFigure": "name?: React.ReactNode;\n  blurb?: React.ReactNode;\n  /** Looping video URL for the 132x112 media slot. */\n  video?: string;\n  /** Any node for the media slot (e.g. an animated SVG fallback). */\n  media?: React.ReactNode;\n  className?: string;"
+    "TechFigure": "name?: React.ReactNode;\n  blurb?: React.ReactNode;\n  /** Looping video URL for the 132x112 media slot. */\n  video?: string;\n  /** Any node for the media slot (e.g. an animated SVG fallback). */\n  media?: React.ReactNode;\n  className?: string;",
+    "Pizzaiolo": "/** Which Napoli token colours the mascot. Maps to --ember / --flour / --bg. */\n  tone?: 'ember' | 'ink' | 'cream';\n  /** Rendered width in px; height follows the 388x490 aspect. Defaults to 160. */\n  size?: number;\n  /** Accessible name. Omit to render the mascot as decorative (aria-hidden). */\n  title?: string;\n  className?: string;\n  style?: React.CSSProperties;"
   }
 }

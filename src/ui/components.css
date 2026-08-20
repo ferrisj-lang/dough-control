@@ -108,6 +108,7 @@ input.txt:focus { outline: none; border-color: var(--ember); }
 .esmall { font-family: 'Anton', sans-serif; font-size: 24px; letter-spacing: .5px; text-transform: uppercase; }
 .ebig { font-family: 'Anton', sans-serif; font-size: 48px; letter-spacing: .5px; text-transform: uppercase; line-height: .82; }
 .etag { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ember); margin-top: 9px; }
+.pizzaiolo { display: block; max-width: 100%; height: auto; }
 .wordmark { font-family: 'Anton', sans-serif; font-size: 23px; letter-spacing: .5px; text-transform: uppercase; color: var(--ember); line-height: 1; }
 .tricolore { display: flex; align-items: center; gap: 10px; color: var(--faint); font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; justify-content: center; margin-top: 10px; }
 .tricolore::before, .tricolore::after { content: ''; height: 4px; flex: 1; border-radius: 2px; background: linear-gradient(to right, var(--green) 0 33%, #fff 33% 66%, var(--ember) 66% 100%); }

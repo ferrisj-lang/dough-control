@@ -70,12 +70,15 @@ value pairs it with `.val`: `<span className="mono val">62 %</span>`.
 
 `Button` `Chip` `Card` `Option` `Slider` `Stepper` `StepIndicator` `Ticket`
 `TicketRow` `Timeline` `TimelineItem` `Emblem` `Wordmark` `Tricolore` `Checker`
-`CodeBox` `Toast` `Callout` `TechFigure`
+`Pizzaiolo` `CodeBox` `Toast` `Callout` `TechFigure`
 
 Compounds: `Ticket` takes `TicketRow` children; `Timeline` takes `TimelineItem`
-children. Brand devices (`Emblem`, `Wordmark`, `Tricolore`, `Checker`) are
-deliberately scoped — the checkerboard and tricolore belong to headers and the
-recipe ticket, not to arbitrary sections.
+children. Brand devices (`Emblem`, `Wordmark`, `Tricolore`, `Checker`,
+`Pizzaiolo`) are deliberately scoped — the checkerboard and tricolore belong to
+headers and the recipe ticket, not to arbitrary sections. `Pizzaiolo` is the
+mascot: it takes `tone="ember" | "ink" | "cream"` (mapped to `--ember` /
+`--flour` / `--bg`) and a `size` in px. Its artwork already contains the
+"Dough Control" lettering, so never place it next to `Wordmark`.
 
 ## Idiomatic example
 
