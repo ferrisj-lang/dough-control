@@ -22,7 +22,7 @@ export { default as Stepper } from "./Stepper.jsx";
 export { default as StepIndicator } from "./StepIndicator.jsx";
 export { default as Ticket, TicketRow } from "./Ticket.jsx";
 export { default as Timeline, TimelineItem } from "./Timeline.jsx";
-export { default as Emblem, Wordmark, Tricolore, Checker } from "./Brand.jsx";
+export { default as Emblem, Wordmark, Tricolore, Checker, Pizzaiolo } from "./Brand.jsx";
 export { default as CodeBox } from "./CodeBox.jsx";
 export { default as Toast } from "./Toast.jsx";
 export { default as Callout } from "./Callout.jsx";

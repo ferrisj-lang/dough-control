@@ -142,3 +142,33 @@ node .ds-sync/package-validate.mjs ./ds-bundle
   and `.wrap` match the compiled CSS exactly. Not rewritten (it pre-existed).
 - **Known-warn check**: `tokens: 14 defined, 13 referenced` fired again
   (`--danger` unused) — expected, already recorded above. No new warns.
+
+## Run log — 2026-08-20 (phase 2: pizzaiolo mascot)
+
+- **Added `Pizzaiolo` to `src/ui/Brand.jsx`** — 20 components now. Ported from
+  the Claude Design project *Dough Control design review*
+  (`4194fc6f-2267-4f32-a885-02e5d6b02424`, `assets/pizzaiolo-*.svg`).
+- **The three exported artworks are byte-identical; only the root `fill`
+  differs** (`red` = `#CC2A1E` = `--ember`, `ink` = `#2B1A12` = `--flour`,
+  `cream` = `--bg`). So the port is ONE inlined SVG driven by `currentColor`
+  with a `tone` prop, not three copies. Do not re-add the other two files.
+- **The source SVG's `st0`–`st5` class attributes are inert** — the asset ships
+  no `<style>` block, so every element inherits the root fill. They were dropped
+  during the port; the mascot is monochrome by construction. If a future asset
+  revision adds a `<style>` block, this port must be redone, not patched.
+- **The artwork contains its own "Perfect Pizza / DOUGH CONTROL" lettering.**
+  Do not compose `Pizzaiolo` next to `Wordmark` — the first draft of
+  `StartScreenHeader` did and printed the wordmark twice. It now pairs the
+  mascot with a tracked-caps tagline instead.
+- **There is a ~2px detached speck below the figure** (`M298.2,653.8` in the
+  source path data, inside the viewBox). It is in the customer's original asset
+  and was kept deliberately — faithful port, not a rendering bug. Remove it in
+  the source SVG if it is unwanted, not in the component.
+- **The library is now AHEAD of the app on the brand layer.** `dough-control.jsx`
+  has no mascot and no `.pizzaiolo` class, so the app ⇄ library mirror rule above
+  is *intentionally* violated here until the Sprint 3 redesign lands in the app.
+  This is the one known divergence; everything else still mirrors.
+- Bundle grew 21 KB → 42 KB (inlined path data). Render check clean on the first
+  try; 19 components carried their grades forward, only `Pizzaiolo` was captured
+  and graded (5 cells, all good).
+- `conventions.md` component list updated to include `Pizzaiolo`.
