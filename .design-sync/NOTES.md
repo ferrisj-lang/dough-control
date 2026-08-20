@@ -99,15 +99,46 @@ node .ds-sync/package-validate.mjs ./ds-bundle
   if the README size warning ever fires.
 - The bundle pulls **no npm packages** (`inlined npm packages: 0`); React comes
   from `_vendor/`. A future dependency in `src/ui/` changes that.
-- **Grades do NOT carry across machines until a successful upload exists.**
-  Verification state lives in the gitignored `.design-sync/.cache/review/`, and
-  cross-machine carry-forward comes from the uploaded project's `_ds_sync.json`.
-  Because this run never uploaded, the first run on any other machine
-  **re-grades all 19 components** (roughly 20–30 min of capture + sheet review).
-  The 19 authored previews in `.design-sync/previews/` ARE committed, so nothing
-  needs re-authoring — only re-grading. After the first successful upload this
-  stops being true.
-- **Upload never happened on this run** — `DesignSync` had no design-system
-  authorization in this environment, so there is no `projectId` in the config
-  and no `_ds_sync.json` anchor in any project. The next run is still a
-  first-time import: it must create/choose the project, then upload.
+- **Grades carry across machines now that an upload exists.** Verification state
+  lives in the gitignored `.design-sync/.cache/review/`, but cross-machine
+  carry-forward comes from the uploaded project’s `_ds_sync.json` — which now
+  exists. A future run fetches it to `.design-sync/.cache/remote-sync.json` and
+  re-grades only what changed, instead of all 19.
+- **`dtsPropsFor` is hand-maintained and will silently rot** — see the bullet
+  above; nothing machine-checks it against `src/ui/*.jsx`.
+
+## Run log — 2026-08-20 (first successful upload)
+
+- **Uploaded.** Project `Dough Control DS`
+  (`3ce763e4-a510-4c38-b31e-6045a1db78bd`), pinned as `cfg.projectId`. 121
+  files. `package-validate.mjs` exited 0 on the **first** run — no self-heal
+  iterations. All 19 components authored, 66 cells, every cell graded `good`.
+- **NOTES said `cfg.overrides.Toast = {cardMode:"single", primaryStory:"Saved"}`
+  was set. It is not — `config.json` has no `overrides` key at all**, and it
+  did not need one: no `[GRID_OVERFLOW]` fired and all four Toast cells render
+  inside their cells, because the authored `PinnedInAScreen` cell supplies its
+  own positioned container. Do not add the override to "fix" a problem that
+  isn't occurring; if Toast ever does escape its cell, that config line is the
+  remedy.
+- **No `tokens/` directory is emitted, and that is correct.** `cfg.tokensGlob`
+  points at `src/ui/tokens.css`, which the converter folds into
+  `_ds_bundle.css` (901 KB, includes components.css + tokens). `styles.css` is
+  just two `@import`s — `fonts/fonts.css` and `./_ds_bundle.css` — so the
+  token closure reaches rendered designs. A future run should not hunt for a
+  missing `tokens/`.
+- **Playwright on a normal machine: no version pinning needed.** Plain
+  `cd .ds-sync && npm i playwright && npx playwright install chromium` fetched
+  chromium-headless-shell build **1234** and the render check passed. The
+  1.56.0/build-1194 pin above applies **only** inside the Claude Code web
+  container.
+- **This machine had no Node at all** (no nvm/fnm/volta/asdf, no Homebrew).
+  Installed Node 22 LTS from the official arm64 tarball into `~/.local` (already
+  on PATH). `@types/react` still had to go in via
+  `npm i --no-save --no-package-lock @types/react`, and `[DTS] parsed 0 .d.ts`
+  is still expected — props come from `dtsPropsFor`, as documented above.
+- **`conventions.md` re-validated against this build and is 100% accurate** —
+  all 14 tokens, 11 utility classes, 19 component names and every prop used in
+  its example resolve in the shipped artifacts; its claims about `.dc`, `body`
+  and `.wrap` match the compiled CSS exactly. Not rewritten (it pre-existed).
+- **Known-warn check**: `tokens: 14 defined, 13 referenced` fired again
+  (`--danger` unused) — expected, already recorded above. No new warns.

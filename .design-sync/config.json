@@ -1,5 +1,6 @@
 {
   "pkg": "dough-control",
+  "projectId": "3ce763e4-a510-4c38-b31e-6045a1db78bd",
   "globalName": "DoughControl",
   "shape": "package",
   "srcDir": "src/ui",
