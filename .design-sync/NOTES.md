@@ -41,13 +41,15 @@ node .ds-sync/package-validate.mjs ./ds-bundle
 
 ## Playwright / render check
 
-- The container caches **chromium build 1194** at `/opt/pw-browsers`
-  (`PLAYWRIGHT_BROWSERS_PATH` is preset). The matching npm release is
-  **playwright 1.56.0** — installing any other version fails with
-  `browserType.launch: Executable doesn't exist`.
-  `cd .ds-sync && npm i playwright@1.56.0 playwright-core@1.56.0`.
-- Do **not** run `playwright install` (the environment forbids it and the
-  browser is already there).
+- **On a normal dev machine**: `cd .ds-sync && npm i playwright && npx playwright
+  install chromium`. Any recent version works — it fetches the browser it pins.
+- **Only inside the Claude Code web container** (which pre-caches chromium build
+  **1194** at `/opt/pw-browsers` and forbids `playwright install`): you must
+  install the release pinned to that exact build, which is **playwright 1.56.0**
+  (`npm i playwright@1.56.0 playwright-core@1.56.0`). Any other version fails
+  with `browserType.launch: Executable doesn't exist`. To re-derive the pairing
+  for a different cached build, read `browsers.json` from candidate tags:
+  `https://raw.githubusercontent.com/microsoft/playwright/v<X.Y.Z>/packages/playwright-core/browsers.json`.
 
 ## Deliberate divergences from the app's CSS
 
@@ -97,6 +99,14 @@ node .ds-sync/package-validate.mjs ./ds-bundle
   if the README size warning ever fires.
 - The bundle pulls **no npm packages** (`inlined npm packages: 0`); React comes
   from `_vendor/`. A future dependency in `src/ui/` changes that.
+- **Grades do NOT carry across machines until a successful upload exists.**
+  Verification state lives in the gitignored `.design-sync/.cache/review/`, and
+  cross-machine carry-forward comes from the uploaded project's `_ds_sync.json`.
+  Because this run never uploaded, the first run on any other machine
+  **re-grades all 19 components** (roughly 20–30 min of capture + sheet review).
+  The 19 authored previews in `.design-sync/previews/` ARE committed, so nothing
+  needs re-authoring — only re-grading. After the first successful upload this
+  stops being true.
 - **Upload never happened on this run** — `DesignSync` had no design-system
   authorization in this environment, so there is no `projectId` in the config
   and no `_ds_sync.json` anchor in any project. The next run is still a
