@@ -88,8 +88,21 @@ node .ds-sync/package-validate.mjs ./ds-bundle
 ## Re-sync risks
 
 - **`dtsPropsFor` is hand-maintained and will silently rot** — it is the single
-  most likely thing to go stale. Diff `src/ui/*.jsx` prop destructuring against
-  it on every re-sync.
+  most likely thing to go stale, and nothing in the converter checks it. Diff it
+  against the sources on every re-sync; the check is mechanical, not manual:
+  for each `componentSrcMap` entry, regex the `function <Name>({ … })`
+  destructuring out of the mapped file and compare that set against the
+  `^\s*(\w+)\??:` keys in the `dtsPropsFor` string. Verified clean on
+  2026-08-26 across all 20.
+- **A component-source change does NOT clear its grade or move its renderHash.**
+  The anchor's `renderHashes` and the grade lifecycle both track the authored
+  `previews/<Name>.tsx` plus preview-affecting config — **not** the component
+  implementation. Proven on 2026-08-26: replacing the whole Pizzaiolo artwork
+  changed `bundleSha12` but left `renderHashes.Pizzaiolo` identical, and
+  `package-capture` reported it "carried forward". **Whenever you change what a
+  component actually renders, delete
+  `.design-sync/.cache/review/<Name>.grade.json` and recapture that component
+  by hand**, or you will ship an unverified render behind a stale "good".
 - **The app ⇄ library CSS mirror can drift silently.** Nothing enforces it; a
   Sprint-N restyle of `dough-control.jsx` will not touch `src/ui/`. Diff the
   app's `css` string against `components.css`/`tokens.css` when the app restyles.
@@ -104,8 +117,6 @@ node .ds-sync/package-validate.mjs ./ds-bundle
   carry-forward comes from the uploaded project’s `_ds_sync.json` — which now
   exists. A future run fetches it to `.design-sync/.cache/remote-sync.json` and
   re-grades only what changed, instead of all 19.
-- **`dtsPropsFor` is hand-maintained and will silently rot** — see the bullet
-  above; nothing machine-checks it against `src/ui/*.jsx`.
 
 ## Run log — 2026-08-20 (first successful upload)
 
@@ -160,10 +171,8 @@ node .ds-sync/package-validate.mjs ./ds-bundle
   Do not compose `Pizzaiolo` next to `Wordmark` — the first draft of
   `StartScreenHeader` did and printed the wordmark twice. It now pairs the
   mascot with a tracked-caps tagline instead.
-- **There is a ~2px detached speck below the figure** (`M298.2,653.8` in the
-  source path data, inside the viewBox). It is in the customer's original asset
-  and was kept deliberately — faithful port, not a rendering bug. Remove it in
-  the source SVG if it is unwanted, not in the component.
+- ~~A ~2px detached speck below the figure~~ — **fixed upstream on 2026-08-26**;
+  see the run log below. The port now tracks the revised square asset.
 - **The library is now AHEAD of the app on the brand layer.** `dough-control.jsx`
   has no mascot and no `.pizzaiolo` class, so the app ⇄ library mirror rule above
   is *intentionally* violated here until the Sprint 3 redesign lands in the app.
@@ -172,3 +181,23 @@ node .ds-sync/package-validate.mjs ./ds-bundle
   try; 19 components carried their grades forward, only `Pizzaiolo` was captured
   and graded (5 cells, all good).
 - `conventions.md` component list updated to include `Pizzaiolo`.
+
+## Run log — 2026-08-26 (re-sync + revised mascot asset)
+
+- **First re-sync ran clean and cost nothing**: driver reported 20 unchanged,
+  `upload.any: false`, capture skipped (`empty_worklist`). The anchor works —
+  no component was re-captured or re-graded.
+- **Mascot asset revised upstream.** The design-review project gained two new
+  root-level files: `pizzaiolo-red-mt1tjw7q-zsbe.svg` (viewBox
+  `0 0 595.3 841.9` — an **A4 page** export, mascot floating in page margins)
+  and `pizzaiolo-red-mt1tm421-fthk.svg` (viewBox `0 0 425.2 425.2` — **square,
+  recentred**). Both drop the speck. **The square one is the asset in use**; the
+  A4 export would render the mascot tiny inside an empty page box. The suffixes
+  are base36 epoch-ms, so the larger sorts later.
+- Port updated: `viewBox="0 0 425.2 425.2"`, and because the canvas is now
+  square `height={size}` replaces the old `size * 490 / 388` aspect maths.
+  Path count 55 → 54; the single missing path is exactly the old speck.
+- `assets/pizzaiolo-{red,ink,cream}.svg` in the design project are the OLD
+  portrait artwork and still contain the speck. Do not re-port from them.
+- Grades: 19 carried forward untouched; Pizzaiolo's was **deliberately cleared
+  and re-graded** for the reason in Re-sync risks above. 71 cells, all good.
